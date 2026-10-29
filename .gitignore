@@ -9,6 +9,9 @@ bin/
 *.so
 *.dylib
 
+# Helm dependency archives (downloaded by `helm dependency build/update`)
+**/charts/*.tgz
+
 # Test binary, built with `go test -c`
 *.test
 
