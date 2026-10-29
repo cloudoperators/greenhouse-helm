@@ -45,10 +45,6 @@ service:
   type: ClusterIP
   port: 80
 
-# Deployment platform. Selects cert handling (tls-acme vs gardener cert-service).
-#   generic | gardener
-platform: generic
-
 ingress:
   enabled: true
   className: "nginx"

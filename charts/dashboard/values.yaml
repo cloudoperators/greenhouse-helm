@@ -13,10 +13,6 @@ image:
 
 replicas: 2
 
-# Deployment platform. Selects cert handling (tls-acme vs gardener cert-service).
-#   generic | gardener
-platform: generic
-
 ingress:
   className: nginx
 
