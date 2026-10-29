@@ -128,7 +128,6 @@ webhook:
         targetPort: 9443
 
 # PostgreSQL sub-chart (postgresql-ng) — SAP internal, pulls from Keppel.
-# Only one of postgresqlng or postgresql may be enabled at a time.
 # Set together with global.dex.backend: postgres.
 postgresqlng:
   enabled: false
@@ -143,13 +142,3 @@ postgresqlng:
     dex: {}
   users:
     dex: {}
-
-# PostgreSQL sub-chart (Bitnami) — open source, pulls from Docker Hub.
-# Only one of postgresqlng or postgresql may be enabled at a time.
-# Set together with global.dex.backend: postgres.
-postgresql:
-  enabled: false
-  auth:
-    database: dex
-    username: dex
-    # password: ""  # set this or use existingSecret

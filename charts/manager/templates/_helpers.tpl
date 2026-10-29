@@ -122,10 +122,3 @@ Define postgresql helpers
 {{- define "workloadIdentity.enabled" -}}
   {{- printf "%t" (required "global.workloadIdentity.enabled missing" .Values.global.workloadIdentity.enabled) }}
 {{- end }}
-
-{{/* Validate that at most one postgresql sub-chart is enabled */}}
-{{- define "manager.validatePostgresql" -}}
-  {{- if and .Values.postgresqlng.enabled .Values.postgresql.enabled -}}
-    {{- fail "postgresqlng.enabled and postgresql.enabled cannot both be true — choose one PostgreSQL provider" -}}
-  {{- end -}}
-{{- end }}
