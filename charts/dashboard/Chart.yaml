@@ -11,7 +11,7 @@ dependencies:
   # cors-proxy is bundled with the dashboard so the dashboard plugin ships a
   # single chart (one Flux HelmRelease) with its required CORS proxy. It remains
   # a standalone, independently installable chart so other web UIs can reuse it.
-  # Gated so operators who provide their own proxy (or use Gateway API) can drop it.
+  # Gated so operators who provide their own proxy can drop it.
   - name: cors-proxy
     version: ">=0.0.0"
     repository: "file://../cors-proxy"
