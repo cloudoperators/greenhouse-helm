@@ -17,6 +17,11 @@ gateway:
   enabled: true
   # GatewayClass name to use (e.g. "kgateway"). Required when gateway.enabled=true.
   className: "kgateway"
+  # Static IP for the Gateway's LoadBalancer, rendered as spec.addresses
+  # (type: IPAddress). Set this to the IP of an existing Ingress to preserve
+  # that address when migrating it to this Gateway. Leave empty for a
+  # provider-assigned dynamic IP.
+  address: ""
   # Controls which namespaces may attach ListenerSets to this Gateway.
   # Allowed values: Same, All, Selector (see Gateway API docs).
   allowedListenersFrom: Same
