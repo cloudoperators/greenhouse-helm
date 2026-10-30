@@ -38,9 +38,19 @@ spec:
         namespaces:
           from: {{ .Values.gateway.allowedListenersFrom }}
     {{- end }}
-  {{- with .Values.gateway.infrastructureAnnotations }}
+  {{- $hpaEnabled := include "gateway.hpaEnabled" . }}
+  {{- if or .Values.gateway.infrastructureAnnotations $hpaEnabled }}
   infrastructure:
+    {{- with .Values.gateway.infrastructureAnnotations }}
     annotations:
       {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if $hpaEnabled }}
+    # kgateway reads HPA config from this GatewayParameters resource.
+    parametersRef:
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
+      name: {{ include "gateway.fullname" . }}
+    {{- end }}
   {{- end }}
 {{- end }}

@@ -64,3 +64,15 @@ Discovery server hostname.
 {{ .Values.discovery.subDomain }}.{{ required "global.dnsDomain is required" .Values.global.dnsDomain }}
 {{- end -}}
 {{- end }}
+
+{{/*
+Whether the kgateway HorizontalPodAutoscaler support is active. HPA is a
+kgateway-specific feature configured via GatewayParameters, so it is only
+enabled when gateway.hpa.enabled is true AND the GatewayClass is kgateway.
+Renders "true" when active, empty otherwise (use with `if`).
+*/}}
+{{- define "gateway.hpaEnabled" -}}
+{{- if and .Values.gateway.hpa.enabled (eq .Values.gateway.className "kgateway") -}}
+true
+{{- end -}}
+{{- end }}
