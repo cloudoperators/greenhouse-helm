@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if and .Values.gateway.enabled (include "gateway.hpaEnabled" .) (.Capabilities.APIVersions.Has "gateway.kgateway.dev/v1alpha1") -}}
+{{- if and .Values.gateway.enabled (include "gateway.hpaEnabled" .) -}}
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayParameters
 metadata:
