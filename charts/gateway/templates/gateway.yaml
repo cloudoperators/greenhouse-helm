@@ -17,13 +17,16 @@ metadata:
   {{- end }}
 spec:
   gatewayClassName: {{ required "gateway.className is required when gateway.enabled=true" .Values.gateway.className }}
+  {{- with .Values.gateway.address }}
+  addresses:
+    - type: IPAddress
+      value: {{ . | quote }}
+  {{- end }}
   allowedListeners:
     namespaces:
       from: {{ .Values.gateway.allowedListenersFrom }}
-  # The Gateway API requires at least one listener on the Gateway itself
-  # (CRD minItems: 1); the per-component HTTPS listeners are attached via
-  # ListenerSets (cors-proxy, discovery server). This base HTTP :80 listener
-  # satisfies that requirement and is overridable via gateway.listeners.
+  # The Gateway API requires at least one listener on the Gateway itself.
+  # This base HTTP :80 listener satisfies that requirement.
   listeners:
     {{- if .Values.gateway.listeners }}
     {{- toYaml .Values.gateway.listeners | nindent 4 }}
