@@ -24,7 +24,7 @@ spec:
   {{- end }}
   allowedListeners:
     namespaces:
-      from: {{ .Values.gateway.allowedListenersFrom }}
+      {{- include "gateway.allowedNamespaces" . | nindent 6 }}
   # The Gateway API requires at least one listener on the Gateway itself.
   # This base HTTP :80 listener satisfies that requirement.
   listeners:
@@ -36,7 +36,7 @@ spec:
       port: 80
       allowedRoutes:
         namespaces:
-          from: {{ .Values.gateway.allowedListenersFrom }}
+          from: Same
     {{- end }}
   {{- $hpaEnabled := include "gateway.hpaEnabled" . }}
   {{- if or .Values.gateway.infrastructureAnnotations $hpaEnabled }}

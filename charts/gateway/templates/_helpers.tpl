@@ -76,3 +76,22 @@ Renders "true" when active, empty otherwise (use with `if`).
 true
 {{- end -}}
 {{- end }}
+
+{{/*
+Render a Gateway API "namespaces" selector block (the body of an
+allowedListeners.namespaces or allowedRoutes.namespaces field): the `from`
+value plus, when from == "Selector", the required label `selector`.
+The caller controls indentation via nindent on the include.
+Fails fast if Selector is chosen without providing a selector, since
+`from: Selector` with no selector is rejected by the API.
+*/}}
+{{- define "gateway.allowedNamespaces" -}}
+from: {{ .Values.gateway.allowedListenersFrom }}
+{{- if eq .Values.gateway.allowedListenersFrom "Selector" }}
+{{- if not .Values.gateway.allowedListenersNamespaceSelector }}
+{{- fail "gateway.allowedListenersNamespaceSelector is required when gateway.allowedListenersFrom=Selector" }}
+{{- end }}
+selector:
+  {{- toYaml .Values.gateway.allowedListenersNamespaceSelector | nindent 2 }}
+{{- end }}
+{{- end }}

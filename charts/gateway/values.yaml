@@ -25,6 +25,10 @@ gateway:
   # Controls which namespaces may attach ListenerSets to this Gateway.
   # Allowed values: Same, All, Selector (see Gateway API docs).
   allowedListenersFrom: Same
+  # Label selector for the namespaces allowed to attach, used only when
+  # allowedListenersFrom is "Selector" (required in that case). Rendered as
+  # namespaces.selector, e.g. {matchLabels: {kubernetes.io/metadata.name: greenhouse}}.
+  allowedListenersNamespaceSelector: {}
   # Listeners on the Gateway itself. The Gateway API requires at least one
   # (CRD minItems: 1); per-component HTTPS listeners are attached via
   # ListenerSets. Leave empty to use the default HTTP :80 base listener, or
