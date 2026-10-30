@@ -14,9 +14,9 @@ global:
 gateway:
   # Deploy the central Gateway resource. When false, only the discovery server
   # resources render (and attach to an externally provided Gateway).
-  enabled: false
+  enabled: true
   # GatewayClass name to use (e.g. "kgateway"). Required when gateway.enabled=true.
-  className: ""
+  className: "kgateway"
   # Controls which namespaces may attach ListenerSets to this Gateway.
   # Allowed values: Same, All, Selector (see Gateway API docs).
   allowedListenersFrom: Same
