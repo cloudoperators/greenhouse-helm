@@ -34,6 +34,21 @@ gateway:
   annotations: {}
   # Annotations placed on spec.infrastructure.annotations (propagated to the underlying LB/proxy).
   infrastructureAnnotations: {}
+  # Horizontal Pod Autoscaling for the Gateway's proxy deployment. This is a
+  # kgateway-specific feature (configured via a GatewayParameters resource), so
+  # it is only rendered when enabled AND gateway.className is "kgateway".
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    # HorizontalPodAutoscaler v2 metrics list, passed through verbatim.
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 80
 
 # API-server OIDC discovery server. Exposes the Kubernetes discovery endpoints
 # (/.well-known/openid-configuration and /openid/v1/jwks) through the Gateway.
