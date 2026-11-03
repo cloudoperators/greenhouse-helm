@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: PluginDefinition
+metadata:
+  name: manager
+spec:
+  displayName: Manager
+  description: >-
+    Greenhouse control plane — the controller-manager and admission webhooks
+    that reconcile Greenhouse resources (clusters, plugins, organizations,
+    teams).
+  version: "0.16.0"
+  helmChart:
+    name: manager
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.16.0
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation.
+      required: true
+      type: string
+    - name: global.dex.backend
+      displayName: Dex backend
+      description: Storage backend for Dex (e.g. kubernetes or postgres).
+      required: true
+      type: string
+    - name: global.plugin.ociMirroringEnabled
+      displayName: Plugin OCI mirroring
+      description: Enable OCI mirroring for plugin Helm charts.
+      required: true
+      type: bool
+    - name: global.pluginPreset.expressionEvaluationEnabled
+      displayName: PluginPreset expression evaluation
+      description: Enable expression evaluation for PluginPresets.
+      required: true
+      type: bool
+    - name: global.pluginPreset.integrationEnabled
+      displayName: PluginPreset integration
+      description: Enable PluginPreset integration.
+      required: true
+      type: bool
+    - name: global.workloadIdentity.enabled
+      displayName: Workload identity
+      description: Enable workload identity for the manager.
+      required: true
+      type: bool
