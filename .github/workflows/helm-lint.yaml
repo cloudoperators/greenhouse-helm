@@ -98,7 +98,7 @@ jobs:
 
   pd-tagged:
     name: PD Tag Check
-    needs: detect-changes
+    needs: [ detect-changes, helm-lint ]
     if: needs.detect-changes.outputs.changed == 'true'
     runs-on: [ ubuntu-latest ]
     steps:
