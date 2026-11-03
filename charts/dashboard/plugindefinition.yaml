@@ -25,6 +25,7 @@ spec:
       displayName: Asset server URL
       description: URL of the Juno asset server from which the dashboard frontend assets are loaded.
       required: true
+      default: origin
       type: string
     - name: ingress.className
       displayName: Ingress class name
