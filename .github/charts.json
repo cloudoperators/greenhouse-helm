@@ -4,10 +4,6 @@
     "chartDir": "charts/authz"
   },
   {
-    "name": "cors-proxy",
-    "chartDir": "charts/cors-proxy"
-  },
-  {
     "name": "dashboard",
     "chartDir": "charts/dashboard"
   },

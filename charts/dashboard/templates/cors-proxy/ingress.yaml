@@ -1,14 +1,14 @@
 {{/*
-SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.cors.ingress.enabled -}}
 {{- $fullName := include "cors-proxy.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+{{- $svcPort := .Values.cors.service.port -}}
+{{- if and .Values.cors.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.cors.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.cors.ingress.annotations "kubernetes.io/ingress.class" .Values.cors.ingress.className}}
   {{- end }}
 {{- end }}
 apiVersion: networking.k8s.io/v1
@@ -17,13 +17,13 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "cors-proxy.labels" . | nindent 4 }}
-  {{- with .Values.ingress.annotations }}
+  {{- with .Values.cors.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
-  {{- if .Values.ingress.tls }}
+  ingressClassName: {{ .Values.cors.ingress.className }}
+  {{- if .Values.cors.ingress.tls }}
   tls:
     - hosts:
         - {{ include "cors-proxy.api.hostname" $ | quote }}

@@ -23,7 +23,40 @@ dashboard:
   demoUser:
     token: demo
 
-# Bundled cors-proxy subchart. Enabled by default; the dashboard needs a CORS
-# proxy in front of the Kubernetes API. Set to false to supply your own.
-cors-proxy:
-  enabled: true
+# Bundled CORS proxy that fronts the Kubernetes API for the dashboard.
+cors:
+  replicaCount: 2
+
+  image:
+    repository: ghcr.io/cloudoperators/greenhouse
+    # Tag is required; populated by the greenhouse image-tag dispatch workflow.
+    tag: ""
+    # Overrides the image tag to use a specific digest instead
+    # digest: ""
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+
+  serviceAccount:
+    create: false
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations: {}
+    tls: true
+
+  resources: {}
+
+  nodeSelector: {}
+  tolerations: []

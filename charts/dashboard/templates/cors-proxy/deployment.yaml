@@ -1,5 +1,5 @@
-{{/* 
-SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Greenhouse contributors
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
 SPDX-License-Identifier: Apache-2.0
 */}}
 
@@ -10,13 +10,13 @@ metadata:
   labels:
     {{- include "cors-proxy.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.cors.replicaCount }}
   selector:
     matchLabels:
       {{- include "cors-proxy.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.cors.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -33,24 +33,24 @@ spec:
                     - key: app.kubernetes.io/name
                       operator: In
                       values:
-                        - {{ include "cors-proxy.name" . }}
+                        - cors-proxy
                 topologyKey: "kubernetes.io/hostname"
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.cors.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "cors-proxy.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.cors.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: cors-proxy
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.cors.securityContext | nindent 12 }}
           image: {{ include "cors-proxy.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.cors.image.pullPolicy }}
           command:
             - /cors-proxy
-            - --target-url={{ default "https://$(KUBERNETES_SERVICE_HOST):$(KUBERNETES_SERVICE_PORT)" .Values.apiServerFQDN }}
+            - --target-url={{ default "https://$(KUBERNETES_SERVICE_HOST):$(KUBERNETES_SERVICE_PORT)" .Values.cors.apiServerFQDN }}
             - --target-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           ports:
             - name: http
@@ -60,12 +60,12 @@ spec:
               containerPort: 6543
               protocol: TCP
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
+            {{- toYaml .Values.cors.resources | nindent 12 }}
+      {{- with .Values.cors.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.cors.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
