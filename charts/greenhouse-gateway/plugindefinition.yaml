@@ -19,4 +19,3 @@ spec:
       description: Base DNS domain for this Greenhouse installation; the Gateway is exposed under this domain.
       required: true
       type: string
-

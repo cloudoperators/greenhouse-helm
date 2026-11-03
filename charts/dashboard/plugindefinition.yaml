@@ -37,4 +37,3 @@ spec:
       description: OIDC client ID the dashboard uses to authenticate users.
       required: false
       type: string
-

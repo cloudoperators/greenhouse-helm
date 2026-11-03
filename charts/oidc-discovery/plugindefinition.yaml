@@ -37,4 +37,3 @@ spec:
       description: Hostname of the Kubernetes API server used as the discovery backend target.
       required: false
       type: string
-

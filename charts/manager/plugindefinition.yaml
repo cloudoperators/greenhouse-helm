@@ -47,4 +47,3 @@ spec:
       description: Enable workload identity for the manager.
       required: true
       type: bool
-

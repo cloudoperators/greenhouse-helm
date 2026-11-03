@@ -31,4 +31,3 @@ spec:
       description: Name of the feature-flags ConfigMap to read. Defaults to <release-name>-feature-flags when unset.
       required: false
       type: string
-
