@@ -127,7 +127,7 @@ webhook:
         protocol: TCP
         targetPort: 9443
 
-# PostgreSQL sub-chart (postgresql-ng) — SAP internal, pulls from Keppel.
+# PostgreSQL sub-chart (postgresql-ng)
 # Set together with global.dex.backend: postgres.
 postgresqlng:
   enabled: false
