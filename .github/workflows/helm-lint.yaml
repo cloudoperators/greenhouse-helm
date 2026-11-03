@@ -46,6 +46,7 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
+          fetch-tags: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Helm
@@ -72,7 +73,7 @@ jobs:
       - name: Run chart-testing (lint)
         run: ct lint --config ct.yaml --target-branch ${{ github.event.repository.default_branch }}
 
-      - name: Check plugindefinition helmChart.version matches Chart.yaml
+      - name: PD chart version check
         env:
           CHANGED_DIRS: ${{ needs.detect-changes.outputs.dirs }}
         run: |
@@ -96,26 +97,7 @@ jobs:
           done <<< "$CHANGED_DIRS"
           exit $fail
 
-  pd-tagged:
-    name: PD Tag Check
-    needs: [ detect-changes, helm-lint ]
-    if: needs.detect-changes.outputs.changed == 'true'
-    runs-on: [ ubuntu-latest ]
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install 'yq'
-        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c # v0.13.5
-        with:
-          yq: v4.25.1
-          setup-tools: |
-            yq
-
-      - name: Check plugindefinition version is not already released
+      - name: PD tag check
         env:
           CHANGED_DIRS: ${{ needs.detect-changes.outputs.dirs }}
         run: |
@@ -135,21 +117,3 @@ jobs:
             fi
           done <<< "$CHANGED_DIRS"
           exit $fail
-
-  checksOk:
-    needs: [ helm-lint, pd-tagged ]
-    if: always()
-    runs-on: [ ubuntu-latest ]
-    steps:
-      - name: Verify all checks passed
-        run: |
-          results="${{ needs.helm-lint.result }} ${{ needs.pd-tagged.result }}"
-          echo "Check results: $results"
-          for r in $results; do
-            # 'success' and 'skipped' (no changed charts) are acceptable; anything else fails.
-            if [ "$r" != "success" ] && [ "$r" != "skipped" ]; then
-              echo "::error::One or more checks did not pass ($results)"
-              exit 1
-            fi
-          done
-          echo "All checks passed."
