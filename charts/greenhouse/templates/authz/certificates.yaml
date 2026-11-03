@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if and .Values.tls.enabled .Values.tls.useSecret }}
+{{- if and .Values.authz.enabled .Values.authz.tls.enabled .Values.authz.tls.useSecret }}
 ---
 # Self-signed bootstrap issuer for the CA
 apiVersion: cert-manager.io/v1
@@ -80,11 +80,11 @@ spec:
     - {{ include "authz.fullname" . }}.{{ .Release.Namespace }}
     - {{ include "authz.fullname" . }}.{{ .Release.Namespace }}.svc
     - {{ include "authz.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
-    {{- range .Values.tls.extraDNSNames }}
+    {{- range .Values.authz.tls.extraDNSNames }}
     - {{ . }}
     {{- end }}
-    {{- if and .Values.dnsEntry.enabled .Values.dnsEntry.dnsName }}
-    - {{ .Values.dnsEntry.dnsName }}
+    {{- if and .Values.authz.dnsEntry.enabled .Values.authz.dnsEntry.dnsName }}
+    - {{ .Values.authz.dnsEntry.dnsName }}
     {{- end }}
   duration: 2160h
   renewBefore: 360h

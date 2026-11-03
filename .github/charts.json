@@ -1,13 +1,5 @@
 [
   {
-    "name": "authz",
-    "chartDir": "charts/authz"
-  },
-  {
-    "name": "cors-proxy",
-    "chartDir": "charts/cors-proxy"
-  },
-  {
     "name": "dashboard",
     "chartDir": "charts/dashboard"
   },
@@ -20,8 +12,8 @@
     "chartDir": "charts/idproxy"
   },
   {
-    "name": "manager",
-    "chartDir": "charts/manager"
+    "name": "greenhouse",
+    "chartDir": "charts/greenhouse"
   },
   {
     "name": "oidc-discovery",

@@ -3,6 +3,7 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
+{{- if .Values.authz.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,7 +16,7 @@ metadata:
     {{- . | nindent 4 }}
   {{- end }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.authz.replicaCount }}
   selector:
     matchLabels:
       {{- include "authz.selectorLabels" . | nindent 6 }}
@@ -28,16 +29,16 @@ spec:
         {{- . | nindent 8 }}
       {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.authz.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "authz.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
+      {{- with .Values.authz.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.ha.enabled }}
+      {{- if .Values.authz.ha.enabled }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -55,60 +56,60 @@ spec:
             matchLabels:
               {{- include "authz.selectorLabels" . | nindent 14 }}
       {{- end }}
-      {{- if or (and .Values.tls.enabled .Values.tls.useSecret) .Values.volumes }}
+      {{- if or (and .Values.authz.tls.enabled .Values.authz.tls.useSecret) .Values.authz.volumes }}
       volumes:
-        {{- if and .Values.tls.enabled .Values.tls.useSecret }}
+        {{- if and .Values.authz.tls.enabled .Values.authz.tls.useSecret }}
         - name: serving-certs
           secret:
             secretName: {{ include "authz.servingCertsSecretName" . }}
         {{- end }}
-        {{- with .Values.volumes }}
+        {{- with .Values.authz.volumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
+        - name: authz
+          {{- with .Values.authz.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           image: {{ include "authz.image" . }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.authz.image.pullPolicy }}
           command:
             - /authz
-          {{- with .Values.args }}
+          {{- with .Values.authz.args }}
           args:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
             - name: webhook
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.authz.service.port }}
               protocol: TCP
             - name: metrics
               containerPort: 6543
               protocol: TCP
-          {{- if or (not .Values.tls.enabled) .Values.env }}
+          {{- if or (not .Values.authz.tls.enabled) .Values.authz.env }}
           env:
-            {{- if not .Values.tls.enabled }}
+            {{- if not .Values.authz.tls.enabled }}
             - name: AUTHZ_TLS_DISABLED
               value: "true"
             {{- end }}
-            {{- with .Values.env }}
+            {{- with .Values.authz.env }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- if or (and .Values.tls.enabled .Values.tls.useSecret) .Values.volumeMounts }}
+          {{- if or (and .Values.authz.tls.enabled .Values.authz.tls.useSecret) .Values.authz.volumeMounts }}
           volumeMounts:
-            {{- if and .Values.tls.enabled .Values.tls.useSecret }}
+            {{- if and .Values.authz.tls.enabled .Values.authz.tls.useSecret }}
             - name: serving-certs
               mountPath: /tmp/k8s-webhook-server/serving-certs
               readOnly: true
             {{- end }}
-            {{- with .Values.volumeMounts }}
+            {{- with .Values.authz.volumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- end }}
-          {{- with .Values.resources }}
+          {{- with .Values.authz.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -120,3 +121,4 @@ spec:
             httpGet:
               path: /readyz
               port: 8081
+{{- end }}

@@ -4,13 +4,11 @@
 apiVersion: greenhouse.sap/v1alpha1
 kind: ClusterPluginDefinition
 metadata:
-  name: manager
+  name: greenhouse
 spec:
-  displayName: Manager
+  displayName: greenhouse
   description: >-
-    Greenhouse control plane — the controller-manager and admission webhooks
-    that reconcile Greenhouse resources (clusters, plugins, organizations,
-    teams).
+    Greenhouse control plane — controller-manager, admission webhooks, cors-proxy, authz that reconcile Greenhouse resources (clusters, plugins, organizations, teams).
   version: "0.16.0"
   helmChart:
     name: manager

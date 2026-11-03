@@ -8,9 +8,7 @@ metadata:
 spec:
   displayName: OIDC Discovery
   description: >-
-    API-server OIDC discovery server for Greenhouse. Exposes the Kubernetes
-    discovery endpoints (/.well-known/openid-configuration and /openid/v1/jwks)
-    through an externally provided Gateway (Gateway API).
+    API-server OIDC discovery server for Greenhouse. Exposes the Kubernetes discovery endpoints (/.well-known/openid-configuration and /openid/v1/jwks) through an externally provided Gateway (Gateway API).
   version: "0.1.0"
   helmChart:
     name: oidc-discovery

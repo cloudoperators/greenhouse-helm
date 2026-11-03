@@ -1,8 +1,8 @@
-{{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor" }}
+{{- if and .Values.cors.enabled (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/ServiceMonitor") }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "cors-proxy.fullname" . }}
+  name: {{ include "manager.fullname" . }}-cors-proxy
   labels:
     plugin: kube-monitoring
 spec:
@@ -17,5 +17,6 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "cors-proxy.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: cors-proxy
+      app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}

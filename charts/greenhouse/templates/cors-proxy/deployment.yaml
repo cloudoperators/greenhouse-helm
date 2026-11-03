@@ -1,0 +1,80 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.cors.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "manager.fullname" . }}-cors-proxy
+  labels:
+    app.kubernetes.io/name: cors-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.cors.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cors-proxy
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      {{- with .Values.cors.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app.kubernetes.io/name: cors-proxy
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - cors-proxy
+                topologyKey: "kubernetes.io/hostname"
+      {{- with .Values.cors.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.cors.serviceAccount.create }}
+      serviceAccountName: {{ default (printf "%s-cors-proxy" (include "manager.fullname" .)) .Values.cors.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ default "default" .Values.cors.serviceAccount.name }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.cors.podSecurityContext | nindent 8 }}
+      containers:
+        - name: cors-proxy
+          securityContext:
+            {{- toYaml .Values.cors.securityContext | nindent 12 }}
+          image: {{ include "manager.image" . }}
+          imagePullPolicy: {{ .Values.controllerManager.image.pullPolicy | default "IfNotPresent" }}
+          command:
+            - /cors-proxy
+            - --target-url={{ default "https://$(KUBERNETES_SERVICE_HOST):$(KUBERNETES_SERVICE_PORT)" .Values.cors.apiServerFQDN }}
+            - --target-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+            - name: metrics
+              containerPort: 6543
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.cors.resources | nindent 12 }}
+      {{- with .Values.cors.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.cors.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

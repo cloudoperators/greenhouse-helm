@@ -1,0 +1,40 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if and .Values.cors.enabled .Values.cors.ingress.enabled -}}
+{{- $fullName := printf "%s-cors-proxy" (include "manager.fullname" .) -}}
+{{- $svcPort := .Values.cors.service.port -}}
+{{- $apiHost := printf "%s.%s" (default "api" .Values.global.kubeAPISubDomain) (required "global.dnsDomain missing" .Values.global.dnsDomain) -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app.kubernetes.io/name: cors-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- with .Values.cors.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.cors.ingress.className }}
+  {{- if .Values.cors.ingress.tls }}
+  tls:
+    - hosts:
+        - {{ $apiHost | quote }}
+      secretName: {{ $fullName }}
+  {{- end }}
+  rules:
+    - host: {{ $apiHost | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $svcPort }}
+{{- end }}

@@ -9,4 +9,10 @@ description: >-
   through an externally provided Gateway (Gateway API).
 type: application
 version: 0.1.0
-appVersion: "v0.18.0"
+appVersion: "v0.1.0"
+
+maintainers:
+  - name: abhijith-darshan
+  - name: fabian-albrecht
+  - name: uwe-mayer
+  - name: onuryilmaz

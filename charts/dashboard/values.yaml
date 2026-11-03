@@ -22,8 +22,3 @@ dashboard:
   # The user for demonstration purposes.
   demoUser:
     token: demo
-
-# Bundled cors-proxy subchart. Enabled by default; the dashboard needs a CORS
-# proxy in front of the Kubernetes API. Set to false to supply your own.
-cors-proxy:
-  enabled: true
