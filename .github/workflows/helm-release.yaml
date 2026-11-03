@@ -7,8 +7,8 @@ on:
       - main
 
 permissions:
-  contents: read
-  id-token: write
+  contents: write
+  packages: write
 
 env:
   REGISTRY_LOGIN: ghcr.io
@@ -17,7 +17,7 @@ env:
 jobs:
   detect-changes:
     name: Detect changed charts
-    runs-on: [ self-hosted ]
+    runs-on: [ ubuntu-latest ]
     permissions:
       contents: read
     outputs:
@@ -74,7 +74,7 @@ jobs:
     name: Release (${{ matrix.chartName }})
     needs: detect-changes
     if: needs.detect-changes.outputs.include != '[]' && needs.detect-changes.outputs.include != ''
-    runs-on: [ self-hosted ]
+    runs-on: [ ubuntu-latest ]
     strategy:
       fail-fast: false
       matrix:
