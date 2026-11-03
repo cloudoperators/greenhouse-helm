@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: PluginDefinition
+metadata:
+  name: idproxy
+spec:
+  displayName: IdP Proxy
+  description: >-
+    Greenhouse IdP Proxy — a Dex-based OIDC issuer that federates upstream
+    identity providers and issues tokens for the platform.
+  version: "0.14.1"
+  helmChart:
+    name: idproxy
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.14.1
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation; the IdP proxy is exposed under this domain.
+      required: true
+      type: string
+    - name: global.dex.backend
+      displayName: Dex backend
+      description: Storage backend for Dex (e.g. kubernetes or postgres).
+      required: true
+      type: string
+    - name: featureFlagsConfigMap
+      displayName: Feature-flags ConfigMap
+      description: Name of the feature-flags ConfigMap to read. Defaults to <release-name>-feature-flags when unset.
+      required: false
+      type: string

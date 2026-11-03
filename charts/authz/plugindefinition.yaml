@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: PluginDefinition
+metadata:
+  name: authz
+spec:
+  displayName: Authz
+  description: >-
+    Authorization server for Greenhouse, enabling support-group-scoped access
+    control via a Kubernetes authorizer webhook.
+  version: "0.8.1"
+  helmChart:
+    name: authz
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.8.1
+  options:
+    - name: dnsEntry.enabled
+      displayName: Enable DNSEntry
+      description: Create a Gardener DNSEntry so shoot-dns-service registers a DNS record for the webhook.
+      required: false
+      type: bool
+    - name: dnsEntry.dnsName
+      displayName: DNSEntry DNS name
+      description: DNS name to register. Required when dnsEntry.enabled is true.
+      required: false
+      type: string
+    - name: service.clusterIP
+      displayName: Service ClusterIP
+      description: Static ClusterIP used as the DNSEntry target. Required when dnsEntry.enabled is true.
+      required: false
+      type: string
+    - name: tls.enabled
+      displayName: Enable TLS
+      description: Serve the webhook with TLS certificates. Disable only for local debugging outside the cluster.
+      required: false
+      type: bool
