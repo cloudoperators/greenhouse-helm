@@ -8,14 +8,12 @@ metadata:
 spec:
   displayName: Manager
   description: >-
-    Greenhouse control plane — the controller-manager and admission webhooks
-    that reconcile Greenhouse resources (clusters, plugins, organizations,
-    teams).
-  version: "0.16.0"
+    Greenhouse control plane — the controller-manager and admission webhooks that reconcile Greenhouse resources (clusters, plugins, organizations, teams).
+  version: "0.16.1"
   helmChart:
     name: manager
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.16.0
+    version: 0.16.1
   options:
     - name: global.dnsDomain
       displayName: DNS domain

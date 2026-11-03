@@ -8,14 +8,12 @@ metadata:
 spec:
   displayName: OIDC Discovery
   description: >-
-    API-server OIDC discovery server for Greenhouse. Exposes the Kubernetes
-    discovery endpoints (/.well-known/openid-configuration and /openid/v1/jwks)
-    through an externally provided Gateway (Gateway API).
-  version: "0.1.0"
+    API-server OIDC discovery server for Greenhouse. Exposes the Kubernetes discovery endpoints (/.well-known/openid-configuration and /openid/v1/jwks) through an externally provided Gateway (Gateway API).
+  version: "0.1.1"
   helmChart:
     name: oidc-discovery
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.1.0
+    version: 0.1.1
   options:
     - name: global.dnsDomain
       displayName: DNS domain

@@ -8,13 +8,12 @@ metadata:
 spec:
   displayName: Authz
   description: >-
-    Authorization server for Greenhouse, enabling support-group-scoped access
-    control via a Kubernetes authorizer webhook.
-  version: "0.8.1"
+    Authorization server for Greenhouse, enabling support-group-scoped access control via a Kubernetes authorizer webhook.
+  version: "0.8.2"
   helmChart:
     name: authz
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.8.1
+    version: 0.8.2
   options:
     - name: dnsEntry.enabled
       displayName: Enable DNSEntry

@@ -8,11 +8,11 @@ metadata:
 spec:
   displayName: Greenhouse Gateway
   description: A plugin definition for the Greenhouse Kubernetes API Gateway.
-  version: "0.1.0"
+  version: "0.1.1"
   helmChart:
     name: greenhouse-gateway
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.1.0
+    version: 0.1.1
   options:
     - name: global.dnsDomain
       displayName: DNS domain
