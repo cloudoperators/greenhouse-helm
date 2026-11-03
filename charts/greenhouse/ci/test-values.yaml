@@ -30,9 +30,6 @@ alerts:
 cors:
   enabled: true
 
-authz:
-  enabled: true
-
 catalogs:
   greenhouse-system-components:
     sources:

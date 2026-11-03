@@ -1,5 +1,9 @@
 [
   {
+    "name": "authz",
+    "chartDir": "charts/authz"
+  },
+  {
     "name": "dashboard",
     "chartDir": "charts/dashboard"
   },
