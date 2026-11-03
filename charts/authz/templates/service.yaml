@@ -3,7 +3,6 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.authz.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,22 +10,22 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "authz.labels" . | nindent 4 }}
-  {{- with merge (.Values.authz.service.annotations | default dict) (include "authz.annotations" . | fromYaml | default dict) }}
+  {{- with merge (.Values.service.annotations | default dict) (include "authz.annotations" . | fromYaml | default dict) }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.authz.service.type }}
-  {{- if .Values.authz.service.clusterIP }}
-  clusterIP: {{ .Values.authz.service.clusterIP }}
+  type: {{ .Values.service.type }}
+  {{- if .Values.service.clusterIP }}
+  clusterIP: {{ .Values.service.clusterIP }}
   {{- end }}
   ports:
     - name: webhook
-      port: {{ .Values.authz.service.port }}
+      port: {{ .Values.service.port }}
       targetPort: webhook
       protocol: TCP
-      {{- if .Values.authz.service.nodePort }}
-      nodePort: {{ .Values.authz.service.nodePort }}
+      {{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
       {{- end }}
     - name: metrics
       port: 6543
@@ -34,4 +33,3 @@ spec:
       protocol: TCP
   selector:
     {{- include "authz.selectorLabels" . | nindent 4 }}
-{{- end }}

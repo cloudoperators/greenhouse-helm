@@ -3,7 +3,6 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.authz.enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -15,7 +14,7 @@ metadata:
     {{- . | nindent 4 }}
   {{- end }}
 rules:
-  - apiGroups: ["manager.sap", "shoot-grafter.cloudoperators.dev"]
+  - apiGroups: ["greenhouse.sap", "shoot-grafter.cloudoperators.dev"]
     resources: ["*"]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
@@ -40,4 +39,3 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: {{ include "authz.fullname" . }}
-{{- end }}
