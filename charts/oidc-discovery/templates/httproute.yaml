@@ -20,7 +20,7 @@ spec:
       name: {{ .Release.Name }}-discovery
       sectionName: https-discovery
   hostnames:
-    - {{ include "gateway.hostname" . | quote }}
+    - {{ include "oidc-discovery.hostname" . | quote }}
   rules:
     - matches:
         - path:

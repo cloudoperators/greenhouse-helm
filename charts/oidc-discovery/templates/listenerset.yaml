@@ -17,7 +17,7 @@ spec:
   parentRef:
     group: gateway.networking.k8s.io
     kind: Gateway
-    name: {{ .Values.discovery.parentRefName | default (include "gateway.fullname" .) }}
+    name: {{ required "discovery.parentRefName is required (the externally provided Gateway to attach to)" .Values.discovery.parentRefName }}
     {{- with .Values.discovery.parentRefNamespace }}
     namespace: {{ . }}
     {{- end }}
@@ -25,10 +25,10 @@ spec:
     - name: https-discovery
       protocol: HTTPS
       port: 443
-      hostname: {{ include "gateway.hostname" . | quote }}
+      hostname: {{ include "oidc-discovery.hostname" . | quote }}
       tls:
         mode: Terminate
         certificateRefs:
           - kind: Secret
-            name: {{ .Values.discovery.tls.secretName | default (printf "%s-tls" (include "gateway.fullname" .)) }}
+            name: {{ .Values.discovery.tls.secretName | default (printf "%s-tls" (include "oidc-discovery.fullname" .)) }}
 {{- end }}
