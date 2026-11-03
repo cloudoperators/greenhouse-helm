@@ -9,6 +9,7 @@ env:
 
 jobs:
   detect-changes:
+    name: Detect Changed Charts
     runs-on: [ ubuntu-latest ]
     outputs:
       changed: ${{ steps.list-changed.outputs.changed }}
@@ -37,6 +38,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   helm-lint:
+    name: Helm Lint
     needs: detect-changes
     if: needs.detect-changes.outputs.changed == 'true'
     runs-on: [ ubuntu-latest ]
@@ -95,6 +97,7 @@ jobs:
           exit $fail
 
   pd-tagged:
+    name: PD Tag Check
     needs: detect-changes
     if: needs.detect-changes.outputs.changed == 'true'
     runs-on: [ ubuntu-latest ]
@@ -133,7 +136,7 @@ jobs:
           done <<< "$CHANGED_DIRS"
           exit $fail
 
-  checks-ok:
+  checksOk:
     needs: [ helm-lint, pd-tagged ]
     if: always()
     runs-on: [ ubuntu-latest ]
