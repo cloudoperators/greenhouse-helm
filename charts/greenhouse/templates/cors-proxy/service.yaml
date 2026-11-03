@@ -3,12 +3,14 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
+{{- if .Values.cors.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "cors-proxy.fullname" . }}
+  name: {{ include "manager.fullname" . }}-cors-proxy
   labels:
-    {{- include "cors-proxy.labels" . | nindent 4 }}
+    app.kubernetes.io/name: cors-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   type: {{ .Values.cors.service.type }}
   ports:
@@ -21,4 +23,6 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    {{- include "cors-proxy.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/name: cors-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

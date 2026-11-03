@@ -142,3 +142,76 @@ postgresqlng:
     dex: {}
   users:
     dex: {}
+
+# Legacy pod-based CORS proxy that fronts the Kubernetes API for the dashboard
+# UI in the pre-Gateway (nginx ingress) topology. Disabled by default; enable
+# per-environment during the Gateway migration. Uses the same image/appVersion
+# as the controller (controllerManager.image), so one bump covers both.
+cors:
+  enabled: false
+  replicaCount: 2
+  imagePullSecrets: []
+  serviceAccount:
+    create: false
+    annotations: {}
+    name: ""
+  podAnnotations: {}
+  podSecurityContext: {}
+  securityContext: {}
+  # Overrides the upstream target; defaults to the in-cluster API server.
+  apiServerFQDN: ""
+  service:
+    type: ClusterIP
+    port: 80
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations: {}
+    tls: true
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+
+# Authz webhook, folded into the manager chart. Disabled by default; enable
+# per-environment. Uses the same image/appVersion as the controller
+# (controllerManager.image), so one bump covers both.
+authz:
+  enabled: false
+  replicaCount: 1
+  image:
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+  commonAnnotations: {}
+  commonLabels: {}
+  podSecurityContext: {}
+  securityContext: {}
+  service:
+    type: ClusterIP
+    port: 9443
+    clusterIP: ""
+    nodePort: null
+    annotations: {}
+  dnsEntry:
+    enabled: false
+    dnsName: ""
+    annotations: {}
+  tls:
+    enabled: true
+    useSecret: true
+    secretName: ""
+    extraDNSNames: []
+  volumes: []
+  volumeMounts: []
+  env: []
+  args: []
+  resources: {}
+  ha:
+    enabled: false
+
+# Default Catalog custom resources (greenhouse.sap/Catalog). Keyed by name;
+# each entry renders a Catalog with its spec.sources passed through verbatim.
+catalogs: {}

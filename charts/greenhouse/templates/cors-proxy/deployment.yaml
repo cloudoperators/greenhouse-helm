@@ -3,17 +3,20 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
+{{- if .Values.cors.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cors-proxy.fullname" . }}
+  name: {{ include "manager.fullname" . }}-cors-proxy
   labels:
-    {{- include "cors-proxy.labels" . | nindent 4 }}
+    app.kubernetes.io/name: cors-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.cors.replicaCount }}
   selector:
     matchLabels:
-      {{- include "cors-proxy.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/name: cors-proxy
+      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       {{- with .Values.cors.podAnnotations }}
@@ -21,7 +24,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "cors-proxy.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/name: cors-proxy
+        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       affinity:
         podAntiAffinity:
@@ -39,15 +43,19 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "cors-proxy.serviceAccountName" . }}
+      {{- if .Values.cors.serviceAccount.create }}
+      serviceAccountName: {{ default (printf "%s-cors-proxy" (include "manager.fullname" .)) .Values.cors.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ default "default" .Values.cors.serviceAccount.name }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.cors.podSecurityContext | nindent 8 }}
       containers:
         - name: cors-proxy
           securityContext:
             {{- toYaml .Values.cors.securityContext | nindent 12 }}
-          image: {{ include "cors-proxy.image" . }}
-          imagePullPolicy: {{ .Values.cors.image.pullPolicy }}
+          image: {{ include "manager.image" . }}
+          imagePullPolicy: {{ .Values.controllerManager.image.pullPolicy | default "IfNotPresent" }}
           command:
             - /cors-proxy
             - --target-url={{ default "https://$(KUBERNETES_SERVICE_HOST):$(KUBERNETES_SERVICE_PORT)" .Values.cors.apiServerFQDN }}
@@ -69,3 +77,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}

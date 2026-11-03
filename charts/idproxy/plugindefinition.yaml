@@ -9,11 +9,11 @@ spec:
   displayName: IdP Proxy
   description: >-
     Greenhouse IdP Proxy — a Dex-based OIDC issuer that federates upstream identity providers and issues tokens for the platform.
-  version: "0.14.2"
+  version: "0.1.0"
   helmChart:
     name: idproxy
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.14.2
+    version: 0.1.0
   options:
     - name: global.dnsDomain
       displayName: DNS domain

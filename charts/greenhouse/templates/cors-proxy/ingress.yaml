@@ -3,20 +3,17 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.cors.ingress.enabled -}}
-{{- $fullName := include "cors-proxy.fullname" . -}}
+{{- if and .Values.cors.enabled .Values.cors.ingress.enabled -}}
+{{- $fullName := printf "%s-cors-proxy" (include "manager.fullname" .) -}}
 {{- $svcPort := .Values.cors.service.port -}}
-{{- if and .Values.cors.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.cors.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.cors.ingress.annotations "kubernetes.io/ingress.class" .Values.cors.ingress.className}}
-  {{- end }}
-{{- end }}
+{{- $apiHost := printf "%s.%s" (default "api" .Values.global.kubeAPISubDomain) (required "global.dnsDomain missing" .Values.global.dnsDomain) -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "cors-proxy.labels" . | nindent 4 }}
+    app.kubernetes.io/name: cors-proxy
+    app.kubernetes.io/instance: {{ .Release.Name }}
   {{- with .Values.cors.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -26,11 +23,11 @@ spec:
   {{- if .Values.cors.ingress.tls }}
   tls:
     - hosts:
-        - {{ include "cors-proxy.api.hostname" $ | quote }}
+        - {{ $apiHost | quote }}
       secretName: {{ $fullName }}
   {{- end }}
   rules:
-    - host: {{ include "cors-proxy.api.hostname" $ | quote }}
+    - host: {{ $apiHost | quote }}
       http:
         paths:
           - path: /

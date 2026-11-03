@@ -8,7 +8,3 @@ global:
 image:
   tag: ""
   digest: "sha256@testing"
-
-cors:
-  image:
-    tag: "v0.18.0"
