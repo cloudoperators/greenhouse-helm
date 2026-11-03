@@ -12,7 +12,7 @@ permissions:
 
 env:
   REGISTRY_LOGIN: ghcr.io
-  OCI_BASE: ghcr.io/greenhouse-helm/charts
+  OCI_BASE: ghcr.io/cloudoperators/greenhouse-helm/charts
 
 jobs:
   detect-changes:
