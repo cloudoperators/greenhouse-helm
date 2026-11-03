@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: PluginDefinition
+metadata:
+  name: dashboard
+spec:
+  displayName: Dashboard
+  description: >-
+    Greenhouse dashboard — the web UI for viewing and managing the Greenhouse
+    platform.
+  version: "0.3.1"
+  helmChart:
+    name: dashboard
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.3.1
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation; the dashboard is exposed under this domain.
+      required: true
+      type: string
+    - name: dashboard.assetServerURL
+      displayName: Asset server URL
+      description: URL of the Juno asset server from which the dashboard frontend assets are loaded.
+      required: true
+      type: string
+    - name: ingress.className
+      displayName: Ingress class name
+      description: IngressClass used to expose the dashboard.
+      required: true
+      type: string
+    - name: global.oidc.clientID
+      displayName: OIDC client ID
+      description: OIDC client ID the dashboard uses to authenticate users.
+      required: false
+      type: string

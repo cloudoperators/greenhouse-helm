@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: PluginDefinition
+metadata:
+  name: cors-proxy
+spec:
+  displayName: CORS Proxy
+  description: >-
+    CORS proxy that fronts the Kubernetes API server, adding the CORS headers
+    the Greenhouse dashboard needs to call the API from the browser.
+  version: "0.12.1"
+  helmChart:
+    name: cors-proxy
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.12.1
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation; the proxy is exposed under this domain.
+      required: true
+      type: string
