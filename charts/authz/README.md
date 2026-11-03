@@ -1,6 +1,6 @@
 # Greenhouse authz
 
-Authorization server for Greenhouse, enabling support-group-scoped access control via Kubernetes authorizer webhook.
+RBAC Authorization server for Greenhouse, enabling support-group-scoped access control via Kubernetes authorizer webhook.
 
 ## Prerequisites
 
