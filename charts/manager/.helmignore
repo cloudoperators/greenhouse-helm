@@ -24,3 +24,6 @@
 
 # Ignore Kustomize files.
 kustomization.yaml
+
+# Greenhouse PluginDefinition is platform metadata, not a packaged manifest.
+plugindefinition.yaml

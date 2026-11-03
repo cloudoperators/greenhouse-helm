@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: ClusterPluginDefinition
+metadata:
+  name: oidc-discovery
+spec:
+  displayName: OIDC Discovery
+  description: >-
+    API-server OIDC discovery server for Greenhouse. Exposes the Kubernetes
+    discovery endpoints (/.well-known/openid-configuration and /openid/v1/jwks)
+    through an externally provided Gateway (Gateway API).
+  version: "0.1.0"
+  helmChart:
+    name: oidc-discovery
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.1.0
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation; the discovery endpoint is exposed at <subDomain>.<dnsDomain>.
+      required: true
+      type: string
+    - name: discovery.parentRefName
+      displayName: Parent Gateway name
+      description: Name of the externally provided Gateway the discovery ListenerSet attaches to.
+      required: true
+      type: string
+    - name: discovery.parentRefNamespace
+      displayName: Parent Gateway namespace
+      description: Namespace of the parent Gateway. Defaults to the release namespace when unset.
+      required: false
+      type: string
+    - name: discovery.apiserverHostname
+      displayName: API server hostname
+      description: Hostname of the Kubernetes API server used as the discovery backend target.
+      required: false
+      type: string
