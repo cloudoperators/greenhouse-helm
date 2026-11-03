@@ -16,3 +16,9 @@ dependencies:
     version: ">=0.0.0"
     repository: "file://../cors-proxy"
     condition: cors-proxy.enabled
+
+maintainers:
+  - name: abhijith-darshan
+  - name: fabian-albrecht
+  - name: uwe-mayer
+  - name: onuryilmaz

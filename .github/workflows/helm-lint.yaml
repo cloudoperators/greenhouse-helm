@@ -51,6 +51,13 @@ jobs:
         with:
           version: "v4.2.2"
 
+      - name: Install 'yq'
+        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c # v0.13.5
+        with:
+          yq: v4.25.1
+          setup-tools: |
+            yq
+
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: 3.14
@@ -62,23 +69,6 @@ jobs:
 
       - name: Run chart-testing (lint)
         run: ct lint --config ct.yaml --target-branch ${{ github.event.repository.default_branch }}
-
-  pd-lint:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.changed == 'true'
-    runs-on: [ ubuntu-latest ]
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install 'yq'
-        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c # v0.13.5
-        with:
-          yq: v4.25.1
-          setup-tools: |
-            yq
 
       - name: Check plugindefinition helmChart.version matches Chart.yaml
         env:
@@ -144,13 +134,13 @@ jobs:
           exit $fail
 
   checks-ok:
-    needs: [ helm-lint, pd-lint, pd-tagged ]
+    needs: [ helm-lint, pd-tagged ]
     if: always()
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Verify all checks passed
         run: |
-          results="${{ needs.helm-lint.result }} ${{ needs.pd-lint.result }} ${{ needs.pd-tagged.result }}"
+          results="${{ needs.helm-lint.result }} ${{ needs.pd-tagged.result }}"
           echo "Check results: $results"
           for r in $results; do
             # 'success' and 'skipped' (no changed charts) are acceptable; anything else fails.
