@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/plugindefinition.yaml'
 
 permissions:
   contents: write

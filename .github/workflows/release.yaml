@@ -9,7 +9,7 @@ on:
 
 jobs:
   detect-changes:
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     outputs:
       changed-plugins: ${{ steps.build-matrix.outputs.plugins }}
     steps:
@@ -72,7 +72,7 @@ jobs:
 
   release:
     if: needs.detect-changes.outputs.changed-plugins != '[]'
-    runs-on: [self-hosted]
+    runs-on: [ubuntu-latest]
     needs: [detect-changes]
     name: Release Plugin ${{ matrix.plugin.name }}
     strategy:
