@@ -4,3 +4,4 @@
 
 /.github/                 @cloudoperators/Administrators
 /.github/workflows/       @cloudoperators/greenhouse-core
+/charts/**                @cloudoperators/greenhouse-core
