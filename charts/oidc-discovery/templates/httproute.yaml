@@ -29,7 +29,7 @@ spec:
       filters:
         - type: URLRewrite
           urlRewrite:
-            hostname: kubernetes.default.svc.cluster.local
+            hostname: {{ required "discovery.apiserverHostname is required" .Values.discovery.apiserverHostname }}
         - type: ExtensionRef
           extensionRef:
             group: gateway.kgateway.dev
@@ -46,7 +46,7 @@ spec:
       filters:
         - type: URLRewrite
           urlRewrite:
-            hostname: kubernetes.default.svc.cluster.local
+            hostname: {{ required "discovery.apiserverHostname is required" .Values.discovery.apiserverHostname }}
       backendRefs:
         - group: gateway.kgateway.dev
           kind: Backend
