@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: ClusterPluginDefinition
+metadata:
+  name: greenhouse-gateway
+spec:
+  displayName: Greenhouse Gateway
+  description: A plugin definition for the Greenhouse Kubernetes API Gateway.
+  version: "0.1.0"
+  helmChart:
+    name: greenhouse-gateway
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.1.0
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation; the Gateway is exposed under this domain.
+      required: true
+      type: string

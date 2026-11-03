@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# Default values for gateway.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Optional static IP address requested for the Gateway.
+# If unset, the implementation assigns an address automatically.
+address: ""
+
+# Annotations applied to the Gateway resource
+annotations: {}
+  # cert-manager.io/issuer: letsencrypt-issuer
+
+# Infrastructure-level configuration applied to the underlying load balancer / proxy
+infrastructure:
+  annotations: {}
+    # external-dns.kubernetes.io/target: ingress.example.tld
+
+# Controls which namespaces ListenerSets may attach from.
+# Rendered under spec.allowedListeners.namespaces. Defaults to "from: Same".
+allowedListeners: {}
+  # from: Same   # Same | All | Selector | None
+  # selector:
+  #   matchLabels:
+  #     kubernetes.io/metadata.name: some-namespace
+
+# Listeners define the ports and protocols the Gateway accepts traffic on.
+# If empty, a base HTTP :80 listener is created to satisfy the Gateway API
+# requirement of at least one listener.
+listeners: []
+# - name: https-wildcard
+#   hostname: "*.example.tld"
+#   port: 443
+#   protocol: HTTPS
+#   tls:
+#     mode: Terminate
+#     certificateRefs:
+#     - kind: Secret
+#       name: gateway-wildcard-tls
+#   allowedRoutes:
+#     namespaces:
+#       from: Same   # Same | All | Selector
+
+# kgateway-specific proxy configuration, rendered as a GatewayParameters resource
+# and referenced from the Gateway via spec.infrastructure.parametersRef.
+# The `kube` block is passed through verbatim to spec.kube, so any field
+# supported by kgateway can be set here.
+# See: https://kgateway.dev/docs/envoy/latest/setup/customize/configs/
+gatewayParameters:
+  enabled: false
+  kube: {}
+    # horizontalPodAutoscaler:
+    #   spec:
+    #     minReplicas: 2
+    #     maxReplicas: 5
+    #     metrics:
+    #       - type: Resource
+    #         resource:
+    #           name: cpu
+    #           target:
+    #             type: Utilization
+    #             averageUtilization: 80
+    # service:
+    #   type: LoadBalancer
+    # deployment:
+    #   strategy:
+    #     type: RollingUpdate
+
+global:
+  dnsDomain: ""
