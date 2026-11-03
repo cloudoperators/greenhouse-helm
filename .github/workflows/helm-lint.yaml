@@ -8,7 +8,37 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
+  detect-changes:
+    runs-on: [ ubuntu-latest ]
+    outputs:
+      changed: ${{ steps.list-changed.outputs.changed }}
+      dirs: ${{ steps.list-changed.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f # v2.8.0
+
+      - name: List changed charts
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ct.yaml --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+          # Persist the newline-separated list of changed chart dirs for dependent jobs
+          {
+            echo "dirs<<EOF"
+            echo "$changed"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
   helm-lint:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.changed == 'true'
     runs-on: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -30,14 +60,103 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@6ec842c01de15ebb84c8627d2744a0c2f2755c9f # v2.8.0
 
-      - name: Run chart-testing (list-changed)
-        id: list-changed
-        run: |
-          changed=$(ct list-changed --config ct.yaml --target-branch ${{ github.event.repository.default_branch }})
-          if [[ -n "$changed" ]]; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Run chart-testing (lint)
-        if: steps.list-changed.outputs.changed == 'true'
         run: ct lint --config ct.yaml --target-branch ${{ github.event.repository.default_branch }}
+
+  pd-lint:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.changed == 'true'
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install 'yq'
+        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c # v0.13.5
+        with:
+          yq: v4.25.1
+          setup-tools: |
+            yq
+
+      - name: Check plugindefinition helmChart.version matches Chart.yaml
+        env:
+          CHANGED_DIRS: ${{ needs.detect-changes.outputs.dirs }}
+        run: |
+          fail=0
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            pd="$dir/plugindefinition.yaml"
+            chart="$dir/Chart.yaml"
+            if [ ! -f "$pd" ]; then
+              echo "::warning::$dir has no plugindefinition.yaml, skipping version check"
+              continue
+            fi
+            chartVersion=$(yq '.version' "$chart")
+            pdVersion=$(yq '.spec.helmChart.version' "$pd")
+            if [ "$chartVersion" != "$pdVersion" ]; then
+              echo "::error file=$pd::$dir: Chart.yaml version ($chartVersion) does not match plugindefinition.yaml spec.helmChart.version ($pdVersion). Bump spec.helmChart.version to match."
+              fail=1
+            else
+              echo "$dir: versions match ($chartVersion)"
+            fi
+          done <<< "$CHANGED_DIRS"
+          exit $fail
+
+  pd-tagged:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.changed == 'true'
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install 'yq'
+        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c # v0.13.5
+        with:
+          yq: v4.25.1
+          setup-tools: |
+            yq
+
+      - name: Check plugindefinition version is not already released
+        env:
+          CHANGED_DIRS: ${{ needs.detect-changes.outputs.dirs }}
+        run: |
+          fail=0
+          while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
+            pd="$dir/plugindefinition.yaml"
+            [ -f "$pd" ] || continue
+            name=$(yq '.metadata.name' "$pd")
+            version=$(yq '.spec.version' "$pd")
+            tag="$name/$version"
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "::error file=$pd::$dir: tag '$tag' already exists but the chart has changed. Bump spec.version (and Chart.yaml / spec.helmChart.version) to release a new version."
+              fail=1
+            else
+              echo "$dir: $tag not yet released"
+            fi
+          done <<< "$CHANGED_DIRS"
+          exit $fail
+
+  checks-ok:
+    needs: [ helm-lint, pd-lint, pd-tagged ]
+    if: always()
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Verify all checks passed
+        run: |
+          results="${{ needs.helm-lint.result }} ${{ needs.pd-lint.result }} ${{ needs.pd-tagged.result }}"
+          echo "Check results: $results"
+          for r in $results; do
+            # 'success' and 'skipped' (no changed charts) are acceptable; anything else fails.
+            if [ "$r" != "success" ] && [ "$r" != "skipped" ]; then
+              echo "::error::One or more checks did not pass ($results)"
+              exit 1
+            fi
+          done
+          echo "All checks passed."

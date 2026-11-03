@@ -1,25 +1,29 @@
 name: Release Plugins
 
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - main
     paths:
       - '**/plugindefinition.yaml'
 
+permissions:
+  contents: write
+
 jobs:
   detect-changes:
-    runs-on: [ubuntu-latest]
+    runs-on: [ ubuntu-latest ]
     outputs:
       changed-plugins: ${{ steps.build-matrix.outputs.plugins }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 2
 
       - name: Install 'yq'
-        uses: yokawasa/action-setup-kube-tools@v0.11.2
+        uses: yokawasa/action-setup-kube-tools@9d39563c24d4a419d1a8289c34d6da5a6171252c # v0.13.5
         with:
           yq: v4.25.1
           setup-tools: |
@@ -27,52 +31,59 @@ jobs:
 
       - name: Prepare change detection
         id: prepare-filters
+        if: github.event_name != 'workflow_dispatch'
         run: |
-          # Find all plugin directories with plugindefinition.yaml
-          PLUGINS=$(find charts -name 'plugindefinition.yaml' -not -path '*/\.*' | sed 's|/plugindefinition.yaml||' | sed 's|^charts/||')
-
-          # Create filter.yml for dorny/paths-filter
-          yq e -n '.root = "."' > filter.yml
-          echo "$PLUGINS" | while read plugin; do
-            yq e -i ".$plugin = \"charts/$plugin/plugindefinition.yaml\"" filter.yml
-          done
-          yq e -i 'del(.root)' filter.yml
+          # Build paths-filter config from charts.json, keyed by chart name,
+          # watching each chart's plugindefinition.yaml.
+          jq -r '.[] | "\(.name): [\"\(.chartDir)/plugindefinition.yaml\"]"' \
+            .github/charts.json > filter.yml
           cat filter.yml
 
       - name: Detect changed plugins
-        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
+        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
         id: filter
+        if: github.event_name != 'workflow_dispatch'
         with:
           filters: ./filter.yml
 
       - name: Build plugin matrix
         id: build-matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          FILTER_CHANGES: ${{ steps.filter.outputs.changes }}
         run: |
-          CHANGED_PLUGINS='${{ steps.filter.outputs.changes }}'
-          
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            # Manual run: release every plugin in charts.json
+            CHANGED_PLUGINS=$(jq -c '[.[].name]' .github/charts.json)
+          else
+            CHANGED_PLUGINS="$FILTER_CHANGES"
+          fi
+
           if [ "$CHANGED_PLUGINS" = "[]" ]; then
             echo "No plugins changed"
             echo "plugins=[]" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # Build JSON array with plugin metadata
           PLUGINS="[]"
           for plugin in $(echo "$CHANGED_PLUGINS" | jq -c -r '.[]'); do
-            if [ -f "charts/$plugin/plugindefinition.yaml" ]; then
-              PLUGIN_NAME=$(yq e '.metadata.name' "charts/$plugin/plugindefinition.yaml")
-              PLUGIN_VERSION=$(yq e '.spec.version' "charts/$plugin/plugindefinition.yaml")
-          
-              PLUGINS=$(echo "$PLUGINS" | jq -c ". += [{\"name\": \"$PLUGIN_NAME\", \"version\": \"$PLUGIN_VERSION\", \"dir\": \"$plugin\"}]")
+            CHART_DIR=$(jq -r --arg n "$plugin" '.[] | select(.name == $n) | .chartDir' .github/charts.json)
+            PD="$CHART_DIR/plugindefinition.yaml"
+            if [ -f "$PD" ]; then
+              PLUGIN_NAME=$(yq e '.metadata.name' "$PD")
+              PLUGIN_VERSION=$(yq e '.spec.version' "$PD")
+
+              PLUGINS=$(echo "$PLUGINS" | jq -c ". += [{\"name\": \"$PLUGIN_NAME\", \"version\": \"$PLUGIN_VERSION\", \"dir\": \"$CHART_DIR\"}]")
             fi
           done
-          
+
           echo "plugins=$PLUGINS" >> $GITHUB_OUTPUT
           echo "Changed plugins: $PLUGINS"
 
   release:
     if: needs.detect-changes.outputs.changed-plugins != '[]'
-    runs-on: [ubuntu-latest]
+    runs-on: [ ubuntu-latest ]
     needs: [detect-changes]
     name: Release Plugin ${{ matrix.plugin.name }}
     strategy:
@@ -81,10 +92,10 @@ jobs:
         plugin: ${{ fromJson(needs.detect-changes.outputs.changed-plugins) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Release (${{ matrix.plugin.name }})
-        uses: actions/github-script@v7
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const pluginName = '${{ matrix.plugin.name }}';
