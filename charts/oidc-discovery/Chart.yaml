@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v2
+name: oidc-discovery
+description: >-
+  API-server OIDC discovery server for Greenhouse that exposes the Kubernetes
+  discovery endpoints (/.well-known/openid-configuration, /openid/v1/jwks)
+  through an externally provided Gateway (Gateway API).
+type: application
+version: 0.1.0
+appVersion: "v0.18.0"
