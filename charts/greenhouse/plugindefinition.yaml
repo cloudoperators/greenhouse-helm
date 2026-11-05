@@ -13,7 +13,7 @@ spec:
   helmChart:
     name: greenhouse
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.27.0
+    version: 0.27.1
   options:
     - name: global.dnsDomain
       displayName: DNS domain
