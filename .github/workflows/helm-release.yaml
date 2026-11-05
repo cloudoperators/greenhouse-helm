@@ -14,7 +14,7 @@ permissions:
 
 env:
   REGISTRY_LOGIN: ghcr.io
-  OCI_BASE: ghcr.io/cloudoperators/greenhouse-helm/charts
+  OCI_BASE: ghcr.io/${{ github.repository }}/charts
 
 jobs:
   detect-changes:
