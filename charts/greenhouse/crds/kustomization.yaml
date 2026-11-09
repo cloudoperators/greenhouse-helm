@@ -14,13 +14,3 @@ resources:
 - greenhouse.sap_clusterplugindefinitions.yaml
 - greenhouse.sap_catalogs.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
-- authcodes.dex.coreos.com.yaml
-- authrequests.dex.coreos.com.yaml
-- connectors.dex.coreos.com.yaml
-- devicerequests.dex.coreos.com.yaml
-- devicetokens.dex.coreos.com.yaml
-- oauth2clients.dex.coreos.com.yaml
-- offlinesessionses.dex.coreos.com.yaml
-- passwords.dex.coreos.com.yaml
-- refreshtokens.dex.coreos.com.yaml
-- signingkeies.dex.coreos.com.yaml
