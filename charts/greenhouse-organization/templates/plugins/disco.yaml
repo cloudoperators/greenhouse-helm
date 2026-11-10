@@ -1,0 +1,39 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.disco.enabled }}
+apiVersion: greenhouse.sap/v1alpha1
+kind: Plugin
+metadata:
+  name: disco
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/resource-policy": keep
+  labels:
+    "greenhouse.sap/owned-by": {{ .Values.disco.supportGroup | default .Values.global.supportGroup }}
+spec:
+  pluginDefinitionRef:
+    kind: PluginDefinition
+    name: disco
+  optionValues:
+    - name: record
+      value: {{ required ".Values.disco.record missing" .Values.disco.record }}
+    - name: openstack.zoneName
+      value: {{ required ".Values.disco.zoneName missing" .Values.disco.zoneName }}
+    - name: openstack.authURL
+      value: {{ required ".Values.disco.authURL missing" .Values.disco.authURL }}
+    - name: openstack.regionName
+      value: {{ required ".Values.disco.regionName missing" .Values.disco.regionName }}
+    - name: openstack.username
+      value: {{ required ".Values.disco.username missing" .Values.disco.username }}
+    - name: openstack.userDomainName
+      value: {{ required ".Values.disco.userDomainName missing" .Values.disco.userDomainName }}
+    - name: openstack.password
+      value: {{ required ".Values.disco.password missing" .Values.disco.password }}
+    - name: openstack.projectName
+      value: {{ required ".Values.disco.projectName missing" .Values.disco.projectName }}
+    - name: openstack.projectDomainName
+      value: {{ required ".Values.disco.projectDomainName missing" .Values.disco.projectDomainName }}
+{{- end }}

@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+global:
+  dnsDomain: example.com
+  supportGroup: default
+  oidc:
+    enabled: true
+    issuer: https://oidc.example.com
+    clientID: test-client-id
+    clientSecret: test-client-secret
+
+organization:
+  enabled: true
+  oauth2ClientRedirectURIs:
+    - http://localhost:8000
+
+rbac:
+  adminGroups:
+    - org-cluster-admins
+
+teams:
+  admin:
+    description: The Admin Team
+    mappedIdPGroup: org-admins
+    isSupportGroup: true
+    supportRBAC: true
+
+catalogs:
+  greenhouse-extensions:
+    sources:
+      - repository: https://github.com/cloudoperators/greenhouse-extensions
+        ref:
+          branch: main
+        resources:
+          - cert-manager/plugindefinition.yaml
+
+# cert-manager and the ingress/perses plugins render by default; keep them on.
+ingress:
+  enabled: true
+
+perses:
+  enabled: true

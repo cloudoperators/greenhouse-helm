@@ -1,0 +1,33 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: ClusterPluginDefinition
+metadata:
+  name: greenhouse-organization
+spec:
+  displayName: Greenhouse Organization
+  description: >-
+    Resources required to run a Greenhouse admin organization — the Organization,
+    Teams, RBAC, Catalogs and optional extension Plugins.
+  version: "0.6.23"
+  helmChart:
+    name: greenhouse-organization
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.6.23
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation.
+      required: true
+      type: string
+    - name: global.oidc.enabled
+      displayName: Enable OIDC
+      description: Wire the organization's OIDC authentication from the configured issuer and client credentials.
+      required: false
+      type: bool
+    - name: global.supportGroup
+      displayName: Default support group
+      description: Default value for the greenhouse.sap/owned-by label applied to resources.
+      required: false
+      type: string
