@@ -31,7 +31,7 @@ spec:
     - name: openstack.userDomainName
       value: {{ required ".Values.disco.userDomainName missing" .Values.disco.userDomainName }}
     - name: openstack.password
-      value: {{ required ".Values.disco.password missing" .Values.disco.password }}
+      value: {{ required ".Values.disco.password missing" .Values.disco.password | quote }}
     - name: openstack.projectName
       value: {{ required ".Values.disco.projectName missing" .Values.disco.projectName }}
     - name: openstack.projectDomainName
