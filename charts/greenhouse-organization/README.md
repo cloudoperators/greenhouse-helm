@@ -34,8 +34,9 @@ helm install greenhouse oci://ghcr.io/cloudoperators/greenhouse-helm/charts/gree
 helm install greenhouse-organization oci://ghcr.io/cloudoperators/greenhouse-helm/charts/greenhouse-organization -n greenhouse
 ```
 
-Cross-chart settings (e.g. `global.dnsDomain`, `global.oidc.*`) follow the repository's shared
-`global:` values convention — pass the same globals to each release.
+Cross-chart settings (e.g. `global.dnsDomain`) follow the repository's shared
+`global:` values convention — pass the same globals to each release. Organization-specific
+identity settings live under `organization.oidc.*`.
 
 The release namespace is used as the organization name; install into the namespace that should
 back the organization.

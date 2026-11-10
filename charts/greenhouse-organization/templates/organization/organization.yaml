@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if or .Values.global.oidc.enabled .Values.scim.enabled }}
+{{- if or .Values.organization.oidc.enabled .Values.scim.enabled }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -13,9 +13,9 @@ metadata:
     "helm.sh/resource-policy": keep
 type: greenhouse.sap/orgsecret
 data:
-{{- if .Values.global.oidc.enabled }}
-  oidcClientID: {{ required ".Values.global.oidc.clientID missing" .Values.global.oidc.clientID | b64enc }}
-  oidcClientSecret: {{ required ".Values.global.oidc.clientSecret missing" .Values.global.oidc.clientSecret | b64enc }}
+{{- if .Values.organization.oidc.enabled }}
+  oidcClientID: {{ required ".Values.organization.oidc.clientID missing" .Values.organization.oidc.clientID | b64enc }}
+  oidcClientSecret: {{ required ".Values.organization.oidc.clientSecret missing" .Values.organization.oidc.clientSecret | b64enc }}
 {{ end }}
 {{- if .Values.scim.enabled }}
 {{- if .Values.scim.username }}
@@ -74,12 +74,12 @@ spec:
 {{- if .Values.organization.registryMirrors }}
   configMapRef: registry-mirrors
 {{- end }}
-{{- if or .Values.global.oidc.enabled .Values.scim.enabled }}
+{{- if or .Values.organization.oidc.enabled .Values.scim.enabled }}
   authentication:
-{{- if .Values.global.oidc.enabled }}
+{{- if .Values.organization.oidc.enabled }}
     oidc:
-      issuer: {{ required ".Values.global.oidc.issuer missing" .Values.global.oidc.issuer }}
-      redirectURI: {{ default (printf "https://%s" ( include "idproxy.auth.hostname" .)) .Values.global.oidc.redirectURL }}
+      issuer: {{ required ".Values.organization.oidc.issuer missing" .Values.organization.oidc.issuer }}
+      redirectURI: {{ default (printf "https://%s" ( include "idproxy.auth.hostname" .)) .Values.organization.oidc.redirectURL }}
       clientIDReference:
         name: {{ .Release.Namespace }}-auth
         key: oidcClientID

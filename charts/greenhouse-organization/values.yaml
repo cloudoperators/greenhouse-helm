@@ -4,18 +4,6 @@
 global:
   # -- The DNS domain to be used for all Greenhouse components. e.g. `greenhouse.example.com`.
   dnsDomain:
-  # -- OIDC configuration for the Greenhouse organization.
-  oidc:
-    # -- Enable OIDC authentication on the Organization. When true, issuer/clientID/clientSecret are required.
-    enabled: false
-    # -- OIDC issuer URL. e.g. `https://<tenant>.example.com`.
-    issuer:
-    # -- OIDC redirect URL. Defaults to `https://auth.<dnsDomain>` when unset.
-    redirectURL:
-    # -- OIDC client ID.
-    clientID:
-    # -- OIDC client secret.
-    clientSecret:
   # -- Default support group label (greenhouse.sap/owned-by) applied to resources.
   supportGroup: "default"
   # -- Optional OCI registry mirror for docker.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
@@ -29,6 +17,18 @@ global:
 organization:
   # -- Enable the Organization CR.
   enabled: true
+  # -- OIDC configuration for the organization's federation to the external identity provider.
+  oidc:
+    # -- Enable OIDC authentication on the Organization. When true, issuer/clientID/clientSecret are required.
+    enabled: false
+    # -- OIDC issuer URL of the external identity provider. e.g. `https://<tenant>.example.com`.
+    issuer:
+    # -- OIDC redirect URL. Defaults to `https://auth.<dnsDomain>` when unset.
+    redirectURL:
+    # -- OIDC client ID registered with the external identity provider.
+    clientID:
+    # -- OIDC client secret registered with the external identity provider.
+    clientSecret:
   # -- OAuth2 client redirect URIs registered on the organization.
   oauth2ClientRedirectURIs:
     - "http://localhost:8000"

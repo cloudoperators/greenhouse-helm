@@ -21,7 +21,7 @@ spec:
       description: Base DNS domain for this Greenhouse installation.
       required: true
       type: string
-    - name: global.oidc.enabled
+    - name: organization.oidc.enabled
       displayName: Enable OIDC
       description: Wire the organization's OIDC authentication from the configured issuer and client credentials.
       required: false

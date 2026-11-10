@@ -4,14 +4,14 @@
 global:
   dnsDomain: example.com
   supportGroup: default
+
+organization:
+  enabled: true
   oidc:
     enabled: true
     issuer: https://oidc.example.com
     clientID: test-client-id
     clientSecret: test-client-secret
-
-organization:
-  enabled: true
   oauth2ClientRedirectURIs:
     - http://localhost:8000
 
