@@ -43,6 +43,14 @@ organization:
   # -- Per-registry mirror overrides (docker.io, ghcr.io, gcr.io, quay.io, registry.k8s.io, etc.).
   # registryMirrors: {}
 
+# -- Greenhouse Team CRs mapped to IdP groups. The `admin` key is required.
+teams: {}
+  # admin:
+  #   description:
+  #   mappedIdPGroup:
+  #   isSupportGroup: false
+  #   supportRBAC: false
+
 # -- Extra cluster-admin subject groups bound in the organization's ClusterRoleBinding.
 rbac:
   # -- List of IdP group names granted cluster-admin in addition to the org admin group.
@@ -81,14 +89,6 @@ scim:
   # bearerHeader:
   # -- Bearer token prefix.
   # bearerPrefix:
-
-# -- Greenhouse Team CRs mapped to IdP groups. The `admin` key is required.
-teams: {}
-  # admin:
-  #   description:
-  #   mappedIdPGroup:
-  #   isSupportGroup: false
-  #   supportRBAC: false
 
 ### Configure several Plugins for the Greenhouse organization below.
 
