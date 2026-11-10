@@ -42,6 +42,8 @@ spec:
     - name: predefinedFilters
       value:
         {{ .Values.alerts.predefinedFilters | toYaml | nindent 8 }}
+    - name: alerts.alertmanager.enabled
+      value: {{ .Values.alerts.alertmanager.enabled }}
     - name: alerts.alertmanager.ingress.hosts
       value:
       - {{ required ".Values.alerts.ingress.host missing" .Values.alerts.ingress.host }}
