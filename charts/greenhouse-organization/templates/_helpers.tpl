@@ -15,7 +15,7 @@ Usage: {{ include "flattenOptionValues" (dict "prefix" "externaldns" "values" .V
 {{- define "flattenOptionValues" -}}
 {{- $prefix := .prefix -}}
 {{- range $k, $v := .values -}}
-{{- $key := printf "%s.%s" $prefix $k -}}
+{{- $key := printf "%s.%s" $prefix ($k | replace "." "\\.") -}}
 {{- if kindIs "map" $v }}
 {{- include "flattenOptionValues" (dict "prefix" $key "values" $v) }}
 {{- else if kindIs "slice" $v }}
