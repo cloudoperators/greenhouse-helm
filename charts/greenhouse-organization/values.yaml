@@ -18,18 +18,12 @@ global:
     clientSecret:
   # -- Default support group label (greenhouse.sap/owned-by) applied to resources.
   supportGroup: "default"
-  # -- CA certificate (PEM). Required when the alerts plugin is enabled.
-  caCert:
-  # -- Optional OCI registry mirror for docker.io images. Empty uses the upstream registry.
+  # -- Optional OCI registry mirror for docker.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
   dockerHubMirror: ""
-  # -- Optional OCI registry mirror for ghcr.io images. Empty uses the upstream registry.
+  # -- Optional OCI registry mirror for ghcr.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
   ghcrIoMirror: ""
-  # -- Optional OCI registry mirror for quay.io images. Empty uses the upstream registry.
+  # -- Optional OCI registry mirror for quay.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
   quayIoMirror: ""
-  # -- Optional cluster name, attached as a label to telemetry data.
-  cluster: ""
-  # -- Optional region name, attached as a label to telemetry data.
-  region: ""
 
 # -- Organization CR configuration. Should be enabled only after the initial install of Greenhouse.
 organization:
@@ -214,6 +208,8 @@ alerts:
   enabled: false
   # -- Support group label.
   supportGroup: observability
+  # -- CA certificate (PEM) for the Alertmanager ingress mTLS. Required when the alerts plugin is enabled.
+  caCert:
   # -- Alertmanager endpoint URL. e.g. `https://alertmanager.greenhouse.example.com/api/v2`.
   endpoint:
   # -- Ingress configuration for Alertmanager UI.
