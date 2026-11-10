@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 global:
   dnsDomain: ""
-  oidc:
-    clientID: ""
+  # -- Sub-domain for the Kubernetes API hostname (<kubeAPISubDomain>.<dnsDomain>). Empty defaults to "api".
+  kubeAPISubDomain: ""
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
@@ -18,7 +18,13 @@ ingress:
 
 dashboard:
   assetServerURL: origin
-
+  # OIDC client ID the dashboard SPA uses against the Greenhouse auth proxy (idproxy/dex).
+  authClientId: greenhouse
+  # Hostname overrides. Each is a bare host; when unset it is derived from global.dnsDomain
+  # (dashboard.<dnsDomain>, auth.<dnsDomain>, api.<dnsDomain>).
+  # hostname: ""
+  # authHostname: ""
+  # apiHostname: ""
   # The user for demonstration purposes.
   demoUser:
     token: demo

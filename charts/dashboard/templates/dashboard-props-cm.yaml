@@ -15,7 +15,7 @@ data:
   appProps.json: |
     {
       "authIssuerUrl": {{ include "dashboard.auth.hostname" $ | quote }},
-      "authClientId": {{ default "greenhouse" .Values.global.oidc.clientID | quote }},
+      "authClientId": {{ default "greenhouse" .Values.dashboard.authClientId | quote }},
       "currentHost": {{ required ".Values.dashboard.assetServerURL missing" .Values.dashboard.assetServerURL | quote }},
       "apiEndpoint": {{ include "dashboard.api.hostname" $  | quote }},
       "demoUserToken": {{ get $secretData "token" | b64dec | quote }}

@@ -9,11 +9,11 @@ spec:
   displayName: Dashboard
   description: >-
     Greenhouse dashboard — the web UI for viewing and managing the Greenhouse platform.
-  version: "0.1.0"
+  version: "0.2.0"
   helmChart:
     name: dashboard
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.1.0
+    version: 0.2.0
   options:
     - name: global.dnsDomain
       displayName: DNS domain
@@ -31,8 +31,9 @@ spec:
       description: IngressClass used to expose the dashboard.
       required: true
       type: string
-    - name: global.oidc.clientID
+    - name: dashboard.authClientId
       displayName: OIDC client ID
-      description: OIDC client ID the dashboard uses to authenticate users.
+      description: OIDC client ID the dashboard SPA uses to authenticate users against the Greenhouse auth proxy.
       required: false
+      default: greenhouse
       type: string
