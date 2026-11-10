@@ -21,11 +21,31 @@ spec:
       description: Base DNS domain for this Greenhouse installation.
       required: true
       type: string
+    - name: teams.admin.mappedIdPGroup
+      displayName: Admin IdP group
+      description: IdP group mapped to the organization's admin team. Always required.
+      required: true
+      type: string
     - name: organization.oidc.enabled
       displayName: Enable OIDC
       description: Wire the organization's OIDC authentication from the configured issuer and client credentials.
       required: false
       type: bool
+    - name: organization.oidc.issuer
+      displayName: OIDC issuer
+      description: OIDC issuer URL of the external identity provider. Required when organization.oidc.enabled is true.
+      required: false
+      type: string
+    - name: organization.oidc.clientID
+      displayName: OIDC client ID
+      description: OIDC client ID registered with the external identity provider. Required when organization.oidc.enabled is true.
+      required: false
+      type: string
+    - name: organization.oidc.clientSecret
+      displayName: OIDC client secret
+      description: OIDC client secret registered with the external identity provider. Required when organization.oidc.enabled is true.
+      required: false
+      type: secret
     - name: global.supportGroup
       displayName: Default support group
       description: Default value for the greenhouse.sap/owned-by label applied to resources.
