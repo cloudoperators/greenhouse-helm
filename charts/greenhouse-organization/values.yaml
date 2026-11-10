@@ -81,19 +81,19 @@ catalogs: {}
 scim:
   # -- Enable SCIM sync.
   enabled: false
-  # -- SCIM base URL.
+  # -- SCIM base URL (required when enabled).
   # baseURL:
-  # -- Auth type: basic | token.
-  # authType:
-  # -- Basic auth username.
+  # -- Auth type: "basic" (default) or "token".
+  # authType: basic
+  # -- Basic auth username (required when authType is "basic").
   # username:
-  # -- Basic auth password.
+  # -- Basic auth password (required when authType is "basic").
   # password:
-  # -- Bearer token.
+  # -- Bearer token (required when authType is "token").
   # bearerToken:
-  # -- Bearer header name.
+  # -- Bearer header name (optional, authType "token" only).
   # bearerHeader:
-  # -- Bearer token prefix.
+  # -- Bearer token prefix (optional, authType "token" only).
   # bearerPrefix:
 
 ### Configure several Plugins for the Greenhouse organization below.

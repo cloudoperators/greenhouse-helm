@@ -18,15 +18,12 @@ data:
   oidcClientSecret: {{ required ".Values.organization.oidc.clientSecret missing" .Values.organization.oidc.clientSecret | b64enc }}
 {{ end }}
 {{- if .Values.scim.enabled }}
-{{- if .Values.scim.username }}
-  scimBasicAuthUser: {{ .Values.scim.username | b64enc }}
-{{ end }}
-{{- if .Values.scim.username }}
-  scimBasicAuthPassword: {{ .Values.scim.password | b64enc }}
-{{ end }}
-{{- if .Values.scim.bearerToken }}
-  scimBearerToken: {{ .Values.scim.bearerToken | b64enc }}
-{{ end }}
+{{- if eq (.Values.scim.authType | default "basic") "token" }}
+  scimBearerToken: {{ required ".Values.scim.bearerToken is required when scim.authType is token" .Values.scim.bearerToken | b64enc }}
+{{- else }}
+  scimBasicAuthUser: {{ required ".Values.scim.username is required when scim.authType is basic" .Values.scim.username | b64enc }}
+  scimBasicAuthPassword: {{ required ".Values.scim.password is required when scim.authType is basic" .Values.scim.password | b64enc }}
+{{- end }}
 {{ end }}
 {{ end }}
 ---
@@ -94,6 +91,19 @@ spec:
 {{- if .Values.scim.enabled }}
     scim:
       baseURL: {{ required ".Values.scim.baseURL" .Values.scim.baseURL }}
+      authType: {{ .Values.scim.authType | default "basic" }}
+{{- if eq (.Values.scim.authType | default "basic") "token" }}
+      bearerToken:
+        secret:
+          name: {{ .Release.Namespace }}-auth
+          key: scimBearerToken
+{{- with .Values.scim.bearerHeader }}
+      bearerHeader: {{ . }}
+{{- end }}
+{{- with .Values.scim.bearerPrefix }}
+      bearerPrefix: {{ . }}
+{{- end }}
+{{- else }}
       basicAuthUser:
         secret:
           name: {{ .Release.Namespace }}-auth
@@ -102,6 +112,7 @@ spec:
         secret:
           name: {{ .Release.Namespace }}-auth
           key: scimBasicAuthPassword
+{{- end }}
 {{ end }}
 {{ end }}
 {{ end }}
