@@ -14,6 +14,9 @@ global:
   quayIoMirror: ""
 
 # -- Organization CR configuration. Should be enabled only after the initial install of Greenhouse.
+# Note: the Organization's admin group (spec.mappedOrgAdminIdPGroup) is NOT set here — it is
+# sourced from teams.admin.mappedIdPGroup below, so the admin team and the org admin group stay
+# in sync from a single value.
 organization:
   # -- Enable the Organization CR.
   enabled: true
@@ -44,10 +47,13 @@ organization:
   # registryMirrors: {}
 
 # -- Greenhouse Team CRs mapped to IdP groups. The `admin` key is required.
+# teams.admin.mappedIdPGroup is the single source of truth for the org admins: besides defining
+# the admin Team CR, it also populates the Organization's spec.mappedOrgAdminIdPGroup and is bound
+# as a cluster-admin subject in the organization RBAC.
 teams: {}
   # admin:
   #   description:
-  #   mappedIdPGroup:
+  #   mappedIdPGroup:        # required — also used as the Organization admin group
   #   isSupportGroup: false
   #   supportRBAC: false
 
