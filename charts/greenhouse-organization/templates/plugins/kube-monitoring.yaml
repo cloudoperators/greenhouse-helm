@@ -156,7 +156,7 @@ data:
         - groupVersionKind:
             group: source.extensions.fluxcd.io
             version: v1
-            kind: ArtifactGenerators
+            kind: ArtifactGenerator
           metricNamePrefix: gotk
           metrics:
             - name: "resource_info"
