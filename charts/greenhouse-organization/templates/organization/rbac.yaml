@@ -46,7 +46,15 @@ rules:
   verbs: ["get", "list", "watch", "patch"]
 
 - apiGroups: [""]
-  resources: ["services", "ingresses", "endpoints", "endpointslices"]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list", "watch", "patch"]
+
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch", "patch"]
+
+- apiGroups: ["discovery.k8s.io"]
+  resources: ["endpointslices"]
   verbs: ["get", "list", "watch", "patch"]
 
 - apiGroups: ["batch"]
