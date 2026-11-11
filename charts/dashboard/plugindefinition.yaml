@@ -46,13 +46,13 @@ spec:
       displayName: Gateway exposure
       description: Expose the dashboard UI through the externally provided Gateway (ListenerSet + HTTPRoute) instead of a Kubernetes Ingress.
       required: false
-      default: "true"
+      default: true
       type: bool
     - name: ingress.enabled
       displayName: Ingress exposure
       description: Expose the dashboard UI through a legacy Kubernetes Ingress. Disabled by default in favour of gateway exposure.
       required: false
-      default: "false"
+      default: false
       type: bool
     - name: dashboard.corsProxy.enabled
       displayName: Gateway CORS proxy
