@@ -29,15 +29,3 @@ alerts:
 
 cors:
   enabled: true
-
-catalogs:
-  greenhouse-system-components:
-    sources:
-      - repository: https://github.com/cloudoperators/greenhouse-helm
-        ref:
-          branch: main
-        resources:
-          - charts/dashboard/plugindefinition.yaml
-          - charts/greenhouse-gateway/plugindefinition.yaml
-          - charts/idproxy/plugindefinition.yaml
-          - charts/oidc-discovery/plugindefinition.yaml
