@@ -51,6 +51,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Name of the Gateway resource. Uses global.gateway.parentRefName when set so the
+producer name and consumer parentRefs share one value; falls back to the fullname.
+*/}}
+{{- define "gateway.resourceName" -}}
+{{- $gw := (.Values.global | default dict).gateway | default dict -}}
+{{- $gw.parentRefName | default (include "gateway.fullname" .) -}}
+{{- end }}
+
+{{/*
 Render the allowedListeners.namespaces block.
 Controls which namespaces ListenerSets may attach from.
 */}}
