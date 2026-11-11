@@ -9,11 +9,11 @@ spec:
   displayName: IdP Proxy
   description: >-
     Greenhouse IdP Proxy — a Dex-based OIDC issuer that federates upstream identity providers and issues tokens for the platform.
-  version: "0.1.0"
+  version: "0.1.1"
   helmChart:
     name: idproxy
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.1.0
+    version: 0.1.1
   options:
     - name: global.dnsDomain
       displayName: DNS domain
@@ -24,9 +24,4 @@ spec:
       displayName: Dex backend
       description: Storage backend for Dex (e.g. kubernetes or postgres).
       required: true
-      type: string
-    - name: featureFlagsConfigMap
-      displayName: Feature-flags ConfigMap
-      description: Name of the feature-flags ConfigMap to read. Defaults to <release-name>-feature-flags when unset.
-      required: false
       type: string
