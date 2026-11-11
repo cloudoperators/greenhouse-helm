@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: Apache-2.0
 global:
   dnsDomain: greenhouse.tld
-  oidc:
-    clientID: topSecret!
+
+dashboard:
+  authClientId: topSecret!
 
 image:
   tag: ""
