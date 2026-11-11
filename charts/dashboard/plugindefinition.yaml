@@ -9,11 +9,11 @@ spec:
   displayName: Dashboard
   description: >-
     Greenhouse dashboard — the web UI for viewing and managing the Greenhouse platform.
-  version: "0.3.0"
+  version: "0.4.0"
   helmChart:
     name: dashboard
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.3.0
+    version: 0.4.0
   options:
     - name: global.dnsDomain
       displayName: DNS domain
@@ -26,10 +26,15 @@ spec:
       required: true
       default: origin
       type: string
+    - name: global.gateway.parentRefName
+      displayName: Parent Gateway name
+      description: Name of the externally provided Gateway the dashboard and cors-proxy ListenerSets attach to. Required when gateway exposure or the gateway CORS proxy is enabled.
+      required: false
+      type: string
     - name: ingress.className
       displayName: Ingress class name
-      description: IngressClass used to expose the dashboard.
-      required: true
+      description: IngressClass used to expose the dashboard. Only used when the legacy Ingress is enabled.
+      required: false
       type: string
     - name: dashboard.authClientId
       displayName: OIDC client ID
@@ -37,14 +42,21 @@ spec:
       required: false
       default: greenhouse
       type: string
+    - name: dashboard.gateway.enabled
+      displayName: Gateway exposure
+      description: Expose the dashboard UI through the externally provided Gateway (ListenerSet + HTTPRoute) instead of a Kubernetes Ingress.
+      required: false
+      default: "true"
+      type: bool
+    - name: ingress.enabled
+      displayName: Ingress exposure
+      description: Expose the dashboard UI through a legacy Kubernetes Ingress. Disabled by default in favour of gateway exposure.
+      required: false
+      default: "false"
+      type: bool
     - name: dashboard.corsProxy.enabled
       displayName: Gateway CORS proxy
       description: Expose the Kubernetes API server through the gateway with CORS headers so the dashboard can call the API from the browser.
       required: false
       default: "true"
       type: bool
-    - name: dashboard.corsProxy.parentRefName
-      displayName: CORS proxy parent Gateway name
-      description: Name of the externally provided Gateway the cors-proxy ListenerSet attaches to. Required when the gateway CORS proxy is enabled.
-      required: false
-      type: string

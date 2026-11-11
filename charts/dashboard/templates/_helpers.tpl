@@ -47,6 +47,11 @@ contains "dashboard". Falls back to "<release>-dashboard" otherwise.
 {{- printf "%s-cors-proxy" (include "dashboard.fullname" .) }}
 {{- end }}
 
+{{/* Resource name for the gateway (dashboard exposure) sub-chart resources. */}}
+{{- define "dashboard.gateway.fullname" -}}
+{{- printf "%s-gateway" (include "dashboard.fullname" .) }}
+{{- end }}
+
 {{/*
 Print the image reference. Digest takes precedence over tag.
 */}}

@@ -6,6 +6,11 @@ global:
   kubeAPISubDomain: ""
   # -- In-cluster hostname of the Kubernetes API server, used as the static Backend target for the gateway cors-proxy.
   apiserverHostname: "kubernetes.default.svc"
+  # Externally provided Gateway that the dashboard and cors-proxy ListenerSets attach to.
+  # Shared across the Greenhouse charts that expose services through the gateway.
+  gateway:
+    parentRefName: ""
+    parentRefNamespace: ""
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
@@ -16,6 +21,9 @@ image:
 replicas: 2
 
 ingress:
+  # Render the legacy Kubernetes Ingress. Disabled by default in favour of the
+  # gateway-based exposure (dashboard.gateway).
+  enabled: false
   className: nginx
 
 dashboard:
@@ -41,10 +49,6 @@ dashboard:
   corsProxy:
     # Render the gateway cors-proxy resources.
     enabled: true
-    # Reference to the externally provided Gateway the cors-proxy ListenerSet
-    # attaches to. Required when corsProxy.enabled is true.
-    parentRefName: ""
-    parentRefNamespace: ""
     # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
     listenerSetAnnotations: {}
     # Annotations placed on the HTTPRoute resource (e.g. external-dns).
@@ -81,3 +85,18 @@ dashboard:
     timeouts:
       request: 0s
       streamIdle: 0s
+  # Gateway-based exposure of the dashboard UI. Attaches a ListenerSet to the
+  # externally provided Gateway (global.gateway.parentRefName) and routes the
+  # dashboard host (and its "*." wildcard) to the dashboard Service. Default
+  # exposure; the legacy Ingress (ingress.enabled) is the alternative.
+  gateway:
+    # Render the gateway exposure resources.
+    enabled: true
+    # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
+    listenerSetAnnotations: {}
+    # Annotations placed on the HTTPRoute resource (e.g. external-dns).
+    httpRouteAnnotations: {}
+    # TLS certificate Secret name for the HTTPS listeners.
+    # Defaults to <fullname>-gateway-tls; cert-manager creates the Secret at this name.
+    tls:
+      secretName: ""
