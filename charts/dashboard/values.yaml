@@ -54,8 +54,9 @@ dashboard:
     tls:
       secretName: ""
     # Native kgateway CORS policy applied to the route.
-    # The dashboard SPA origin (https://<dashboard hostname>) is always prepended
-    # as the first allowed origin; allowOrigins here adds any further origins.
+    # The dashboard SPA origins (https://<dashboard hostname> and the
+    # https://*.<dashboard hostname> wildcard, matching the dashboard Ingress
+    # hosts) are always prepended; allowOrigins here adds any further origins.
     cors:
       allowCredentials: true
       # Additional allowed origins, appended after the dashboard SPA origin.

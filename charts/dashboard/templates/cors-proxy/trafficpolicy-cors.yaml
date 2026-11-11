@@ -19,10 +19,13 @@ spec:
       name: {{ include "dashboard.corsProxy.fullname" . }}
   cors:
     allowCredentials: {{ .Values.dashboard.corsProxy.cors.allowCredentials }}
-    # The dashboard SPA origin is always allowed first; any configured
-    # allowOrigins are appended after it.
+    # The dashboard SPA origins are always allowed first: the base host and the
+    # "*.<host>" wildcard (kgateway compiles the wildcard to a regex match),
+    # matching the two hosts the dashboard Ingress serves. Any configured
+    # allowOrigins are appended after them.
     allowOrigins:
       - {{ printf "https://%s" (include "dashboard.hostname" .) }}
+      - {{ printf "https://*.%s" (include "dashboard.hostname" .) }}
       {{- with .Values.dashboard.corsProxy.cors.allowOrigins }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
