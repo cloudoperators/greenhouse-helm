@@ -1,0 +1,40 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.dashboard.corsProxy.enabled -}}
+# Applies CORS headers to the API-server route so the Greenhouse dashboard can
+# call the Kubernetes API from the browser, and disables the request /
+# stream-idle timeouts so long-lived watches and log streams stay open.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: {{ include "dashboard.corsProxy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: {{ include "dashboard.corsProxy.fullname" . }}
+  cors:
+    allowCredentials: {{ .Values.dashboard.corsProxy.cors.allowCredentials }}
+    allowOrigins:
+      {{- toYaml .Values.dashboard.corsProxy.cors.allowOrigins | nindent 6 }}
+    allowMethods:
+      {{- toYaml .Values.dashboard.corsProxy.cors.allowMethods | nindent 6 }}
+    allowHeaders:
+      {{- toYaml .Values.dashboard.corsProxy.cors.allowHeaders | nindent 6 }}
+    exposeHeaders:
+      {{- toYaml .Values.dashboard.corsProxy.cors.exposeHeaders | nindent 6 }}
+    maxAge: {{ .Values.dashboard.corsProxy.cors.maxAge }}
+  {{- with .Values.dashboard.corsProxy.timeouts }}
+  timeouts:
+    {{- with .request }}
+    request: {{ . | quote }}
+    {{- end }}
+    {{- with .streamIdle }}
+    streamIdle: {{ . | quote }}
+    {{- end }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,34 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.dashboard.corsProxy.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ include "dashboard.corsProxy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  {{- with .Values.dashboard.corsProxy.listenerSetAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRef:
+    group: gateway.networking.k8s.io
+    kind: Gateway
+    name: {{ required "dashboard.corsProxy.parentRefName is required (the externally provided Gateway to attach to)" .Values.dashboard.corsProxy.parentRefName }}
+    {{- with .Values.dashboard.corsProxy.parentRefNamespace }}
+    namespace: {{ . }}
+    {{- end }}
+  listeners:
+    - name: https-cors-proxy
+      protocol: HTTPS
+      port: 443
+      hostname: {{ include "dashboard.api.host" . | quote }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: {{ .Values.dashboard.corsProxy.tls.secretName | default (printf "%s-tls" (include "dashboard.corsProxy.fullname" .)) }}
+{{- end }}

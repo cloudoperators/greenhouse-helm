@@ -4,6 +4,8 @@ global:
   dnsDomain: ""
   # -- Sub-domain for the Kubernetes API hostname (<kubeAPISubDomain>.<dnsDomain>). Empty defaults to "api".
   kubeAPISubDomain: ""
+  # -- In-cluster hostname of the Kubernetes API server, used as the static Backend target for the gateway cors-proxy.
+  apiserverHostname: "kubernetes.default.svc"
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
@@ -28,3 +30,51 @@ dashboard:
   # The user for demonstration purposes.
   demoUser:
     token: demo
+  # Gateway CORS proxy. Fronts the Kubernetes API server through an externally
+  # provided Gateway and applies CORS at the gateway via a native kgateway
+  # TrafficPolicy, so the dashboard SPA can call the API from the browser.
+  # The exposed hostname is the dashboard's API host (dashboard.apiHostname,
+  # else <global.kubeAPISubDomain|'api'>.<global.dnsDomain>).
+  corsProxy:
+    # Render the gateway cors-proxy resources.
+    enabled: true
+    # Reference to the externally provided Gateway the cors-proxy ListenerSet
+    # attaches to. Required when corsProxy.enabled is true.
+    parentRefName: ""
+    parentRefNamespace: ""
+    # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
+    listenerSetAnnotations: {}
+    # Annotations placed on the HTTPRoute resource (e.g. external-dns).
+    httpRouteAnnotations: {}
+    # TLS certificate Secret name for the HTTPS listener.
+    # Defaults to <fullname>-cors-proxy-tls; cert-manager creates the Secret at this name.
+    tls:
+      secretName: ""
+    # Native kgateway CORS policy applied to the route.
+    # Note: allowCredentials: true combined with allowOrigins: ["*"] is technically
+    # rejected by the browser CORS spec, but this is the combination that worked;
+    # tighten allowOrigins per-install (e.g. ["https://dashboard.<dnsDomain>"]).
+    cors:
+      allowCredentials: true
+      allowOrigins:
+        - "*"
+      allowMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowHeaders:
+        - Authorization
+        - Content-Type
+        - Accept
+      exposeHeaders:
+        - Content-Length
+      maxAge: 86400
+    # Request timeouts applied to the API-server route via the kgateway TrafficPolicy.
+    # Long-lived API watches and log streams are otherwise cut off by the gateway's
+    # default request / stream-idle limits; 0s disables both so they stay open.
+    timeouts:
+      request: 0s
+      streamIdle: 0s

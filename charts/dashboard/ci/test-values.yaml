@@ -5,6 +5,12 @@ global:
 
 dashboard:
   authClientId: topSecret!
+  corsProxy:
+    enabled: true
+    parentRefName: greenhouse-gateway
+    cors:
+      allowOrigins:
+        - "https://dashboard.greenhouse.tld"
 
 image:
   tag: ""
