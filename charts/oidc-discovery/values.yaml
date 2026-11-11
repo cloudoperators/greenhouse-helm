@@ -8,6 +8,11 @@ fullnameOverride: ""
 global:
   # Base DNS domain for this Greenhouse installation (e.g. "greenhouse.example.com").
   dnsDomain: ""
+  # Externally provided Gateway that the discovery ListenerSet attaches to.
+  # Shared across the Greenhouse charts that expose services through the gateway.
+  gateway:
+    parentRefName: ""
+    parentRefNamespace: ""
 
 # API-server OIDC discovery server. Exposes the Kubernetes discovery endpoints
 # (/.well-known/openid-configuration and /openid/v1/jwks) through an externally
@@ -23,10 +28,6 @@ discovery:
   hostname: ""
   # Hostname of the API server used as the static Backend target.
   apiserverHostname: "kubernetes.default.svc"
-  # Reference to the externally provided Gateway the discovery ListenerSet
-  # attaches to. Required — there is no in-chart Gateway to default to.
-  parentRefName: ""
-  parentRefNamespace: ""
   # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
   listenerSetAnnotations: {}
   # Annotations placed on the HTTPRoute resource (e.g. external-dns).
