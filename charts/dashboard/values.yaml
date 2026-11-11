@@ -100,8 +100,7 @@ dashboard:
     httpRouteAnnotations: {}
     # TLS certificate Secret name for the HTTPS listeners. Both the base host and
     # the "*.<host>" wildcard listener use this one secret, so the certificate it
-    # holds must cover BOTH names as SANs (dashboard.<dnsDomain> and
-    # *.dashboard.<dnsDomain>) — cert-manager does not infer the wildcard on its own.
+    # holds must cover BOTH names as SANs (dashboard.<dnsDomain> and *.dashboard.<dnsDomain>)
     # Defaults to <fullname>-gateway-tls.
     tls:
       secretName: ""
