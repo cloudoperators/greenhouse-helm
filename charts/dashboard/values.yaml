@@ -92,11 +92,16 @@ dashboard:
   gateway:
     # Render the gateway exposure resources.
     enabled: true
-    # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
+    # Annotations placed on the ListenerSet resource. Use these to drive cert
+    # provisioning (e.g. a cert-manager issuer), the same way ingress.annotations
+    # drives it for the Ingress.
     listenerSetAnnotations: {}
     # Annotations placed on the HTTPRoute resource (e.g. external-dns).
     httpRouteAnnotations: {}
-    # TLS certificate Secret name for the HTTPS listeners.
-    # Defaults to <fullname>-gateway-tls; cert-manager creates the Secret at this name.
+    # TLS certificate Secret name for the HTTPS listeners. Both the base host and
+    # the "*.<host>" wildcard listener use this one secret, so the certificate it
+    # holds must cover BOTH names as SANs (dashboard.<dnsDomain> and
+    # *.dashboard.<dnsDomain>) — cert-manager does not infer the wildcard on its own.
+    # Defaults to <fullname>-gateway-tls.
     tls:
       secretName: ""
