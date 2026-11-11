@@ -26,7 +26,10 @@ dashboard:
   # (dashboard.<dnsDomain>, auth.<dnsDomain>, api.<dnsDomain>).
   # hostname: ""
   # authHostname: ""
-  # apiHostname: ""
+  # -- Bare host for the Kubernetes API. When unset, defaults to
+  # <global.kubeAPISubDomain|"api">.<global.dnsDomain>. This is the host the
+  # dashboard calls (apiEndpoint) and the host the gateway cors-proxy listens on.
+  apiHostname: ""
   # The user for demonstration purposes.
   demoUser:
     token: demo
