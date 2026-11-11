@@ -6,20 +6,26 @@ global:
   dnsDomain:
   # -- Default support group label (greenhouse.sap/owned-by) applied to resources.
   supportGroup: "default"
-  # -- Optional OCI registry mirror for docker.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
-  dockerHubMirror: ""
-  # -- Optional OCI registry mirror for ghcr.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
-  ghcrIoMirror: ""
-  # -- Optional OCI registry mirror for quay.io images. Empty uses the upstream registry. This value can be used in plugins of this chart
-  quayIoMirror: ""
 
-# -- Organization CR configuration. Should be enabled only after the initial install of Greenhouse.
-# Note: the Organization's admin group (spec.mappedOrgAdminIdPGroup) is NOT set here — it is
-# sourced from teams.admin.mappedIdPGroup below, so the admin team and the org admin group stay
-# in sync from a single value.
+# -- Organization CR configuration.
 organization:
   # -- Enable the Organization CR.
   enabled: true
+  # -- IdP group mapped to the organization admins (Organization spec.mappedOrgAdminIdPGroup
+  # and the admin Team's mappedIdPGroup). Required.
+  mappedOrgAdminIdPGroup:
+  # -- The admin Team CR (always rendered as team "admin"). mappedIdPGroup is mappedOrgAdminIdPGroup above.
+  adminTeam:
+    # -- Admin Team description.
+    description: Greenhouse Admin Team
+    # -- Label the admin Team as a support group.
+    isSupportGroup: false
+  # -- Additional Team CRs mapped to IdP groups (besides the admin team). Each key is a team name.
+  additionalTeams: {}
+    # example-team:
+    #   description:
+    #   mappedIdPGroup:        # required
+    #   isSupportGroup: false
   # -- OIDC configuration for the organization's federation to the external identity provider.
   oidc:
     # -- Enable OIDC authentication on the Organization. When true, issuer/clientID/clientSecret are required.
@@ -36,343 +42,71 @@ organization:
   oauth2ClientRedirectURIs:
     - "http://localhost:8000"
     - "http://localhost:18000"
-  # -- Primary OCI registry mirror.
-  # primaryMirror:
-  # -- OCI registry authentication secret.
-  # registryAuth:
-  #   secretName:
-  #   username:
-  #   password:
-  # -- Per-registry mirror overrides (docker.io, ghcr.io, gcr.io, quay.io, registry.k8s.io, etc.).
-  # registryMirrors: {}
+  # -- SCIM group synchronization configuration.
+  scim:
+    # -- Enable SCIM sync.
+    enabled: false
+    # -- SCIM base URL (required when enabled).
+    # baseURL:
+    # -- Auth type: "basic" (default) or "token".
+    # authType: basic
+    # -- Basic auth username (required when authType is "basic").
+    # username:
+    # -- Basic auth password (required when authType is "basic").
+    # password:
+    # -- Bearer token (required when authType is "token").
+    # bearerToken:
+    # -- Bearer header name (optional, authType "token" only).
+    # bearerHeader:
+    # -- Bearer token prefix (optional, authType "token" only).
+    # bearerPrefix:
+  # -- RBAC objects delivered verbatim from values. Role/RoleBinding are forced into the release namespace.
+  rbac:
+    # -- Enable rendering of the RBAC objects below.
+    enabled: false
+    # -- Annotations merged into every rendered RBAC object.
+    annotations: {}
+    # -- Labels merged into every rendered RBAC object.
+    labels: {}
+    # -- ClusterRole objects, each a full manifest.
+    clusterRoles: []
+    # -- Role objects, each a full manifest.
+    roles: []
+    # -- ClusterRoleBinding objects, each a full manifest.
+    clusterRoleBindings: []
+    # -- RoleBinding objects, each a full manifest.
+    roleBindings: []
+  # -- OCI registry mirror configuration for the organization.
+  mirror:
+    # -- Enable the registry mirror ConfigMap and auth Secret.
+    enabled: false
+    # -- Primary OCI registry mirror. Required when registryMirrors is set.
+    primary:
+    # -- OCI registry authentication secret.
+    registryAuth: {}
+    #   secretName:
+    #   username:
+    #   password:
+    # -- Per-registry mirror overrides (docker.io, ghcr.io, gcr.io, quay.io, registry.k8s.io, etc.).
+    registryMirrors: {}
 
-# -- Greenhouse Team CRs mapped to IdP groups. The `admin` key is required.
-# teams.admin.mappedIdPGroup is the single source of truth for the org admins: besides defining
-# the admin Team CR, it also populates the Organization's spec.mappedOrgAdminIdPGroup and is bound
-# as a cluster-admin subject in the organization RBAC.
-teams: {}
-  # admin:
-  #   description:
-  #   mappedIdPGroup:        # required — also used as the Organization admin group
-  #   isSupportGroup: false
-  #   supportRBAC: false
-
-# -- Extra cluster-admin subject groups bound in the organization's ClusterRoleBinding.
-rbac:
-  # -- List of IdP group names granted cluster-admin in addition to the org admin group.
-  adminGroups: []
-
-# -- Catalog CRs for sourcing PluginDefinitions from upstream repositories.
-# Each key is the catalog name. Supports optional `labels`, `annotations` and `sources`.
-# Defined per environment. Example:
-# catalogs:
-#   greenhouse-extensions:
-#     labels:
-#       greenhouse.sap/owned-by: default
-#     sources:
-#       - repository: https://github.com/cloudoperators/greenhouse-extensions
-#         ref:
-#           branch: main
-#         resources:
-#           - cert-manager/plugindefinition.yaml
+# -- Catalog CRs rendered by templates/catalogs/catalogs.yaml. Each key is the catalog name.
+# Supports optional `labels`, `annotations`, `sources`, and `extraObjects` (string or map, tpl-rendered).
 catalogs: {}
-
-# -- SCIM group synchronization configuration.
-scim:
-  # -- Enable SCIM sync.
-  enabled: false
-  # -- SCIM base URL (required when enabled).
-  # baseURL:
-  # -- Auth type: "basic" (default) or "token".
-  # authType: basic
-  # -- Basic auth username (required when authType is "basic").
-  # username:
-  # -- Basic auth password (required when authType is "basic").
-  # password:
-  # -- Bearer token (required when authType is "token").
-  # bearerToken:
-  # -- Bearer header name (optional, authType "token" only).
-  # bearerHeader:
-  # -- Bearer token prefix (optional, authType "token" only).
-  # bearerPrefix:
 
 ### Configure several Plugins for the Greenhouse organization below.
 
-# -- Configures the cert-manager plugin. gatewayAPI config enables the shim for k8s Gateway resources.
-certManager:
-  # -- cert-manager issuer group used for the ingress-shim defaults when digicertIssuer is enabled.
-  issuerGroup: cert-manager.io
-  webhook:
-    # -- Webhook timeout in seconds.
-    timeoutSeconds: 15
+# -- Greenhouse Plugin CRs, rendered by templates/plugins/plugins.yaml. Each key is a plugin.
+plugins: {}
 
-# -- Configures the DigiCert issuer plugin for automated certificate issuance via cert-manager.
-digicertIssuer:
-  # -- Enable the DigiCert issuer plugin.
+# -- Deploy the bundled Flux observability: state-metrics ConfigMap, PrometheusRule alerts, and perses dashboards.
+fluxAlerts:
+  # -- Enable the bundled Flux state-metrics ConfigMap, PrometheusRule alerts, and dashboards.
   enabled: false
-  # -- DigiCert API token.
-  apiToken:
-  # -- DigiCert organization ID. e.g. `"123456"`.
-  organizationID:
-  # -- DigiCert organization units.
-  organizationUnits:
-  # -- DigiCert CA certificate ID.
-  caCertID:
-
-# -- Configures the DISCO plugin for automated DNS record management with OpenStack Designate.
-disco:
-  # -- Enable the DISCO plugin.
-  enabled: false
-  # -- DNS record to manage. e.g. `ingress.greenhouse.example.com.`.
-  record:
-  # -- DNS zone name. e.g. `greenhouse.example.com.`.
-  zoneName:
-  # -- OpenStack identity endpoint. e.g. `https://identity.example.com/v3`.
-  authURL:
-  # -- OpenStack region name. e.g. `example-region-1`.
-  regionName:
-  # -- OpenStack username.
-  username:
-  # -- OpenStack user domain name. e.g. `Default`.
-  userDomainName:
-  # -- OpenStack password.
-  password:
-  # -- OpenStack project name.
-  projectName:
-  # -- OpenStack project domain name.
-  projectDomainName:
-
-# -- Configures the external-dns plugin for automated DNS record management.
-externalDns:
-  # -- Enable the external-dns plugin.
-  enabled: false
-  # -- OpenStack provider configuration.
-  openstack:
-    # -- Enable OpenStack provider.
-    enabled: false
-    # -- OpenStack identity endpoint. e.g. `https://identity.example.com/v3`.
-    authURL:
-    # -- OpenStack username.
-    username:
-    # -- OpenStack password.
-    password:
-    # -- OpenStack user domain name. e.g. `Default`.
-    userDomainName:
-    # -- OpenStack project ID.
-    projectID:
-    # -- OpenStack region name. e.g. `example-region-1`.
-    regionName:
-  # -- Additional external-dns helm values passed through as-is.
-  options: {}
-
-# -- Configures the NGINX ingress plugin for external access.
-ingress:
-  # -- Enable the ingress plugin.
-  enabled: true
-  # -- Annotations to apply to the ingress (e.g. disco, cert-manager).
-  # annotations: {}
-  # -- Specify the loadBalancer IP for the ingress service.
-  # loadBalancerIP:
-
-# -- Configures the kube-monitoring plugin for Prometheus-based cluster monitoring.
-monitoring:
-  # -- Enable the kube-monitoring plugin.
-  enabled: false
-  # -- Support group label.
-  supportGroup: observability
-  # -- Ingress configuration for Prometheus UI.
-  # ingress:
-  #   host:
-  # -- Extra external labels attached to all metrics.
-  # extLabels: {}
-  # -- Thanos object store config for remote metrics storage.
-  # thanosObjectstoreConfig: {}
-  # -- Alertmanager configuration.
-  alertmanager:
-    # -- Enable Alertmanager.
-    enabled: false
-    # -- Alertmanager hosts to federate to.
-    # hosts: []
-    # -- TLS cert/key for Alertmanager.
-    # tls:
-    #   cert:
-    #   key:
-
-# -- Configures the Thanos plugin for long-term metrics storage and querying.
-thanos:
-  # -- Enable the Thanos plugin.
-  enabled: false
-  # -- Support group label.
-  supportGroup: observability
-  ingress:
-    # -- Add the `disco: "true"` annotation to the Thanos ingresses (OpenStack Designate DNS registration).
-    discoEnabled: false
-
-# -- Configures the Alerts (Supernova) plugin for Alertmanager UI and routing.
-alerts:
-  # -- Enable the Alerts plugin.
-  enabled: false
-  # -- Support group label.
-  supportGroup: observability
-  # -- CA certificate (PEM) for the Alertmanager ingress mTLS. Required when the alerts plugin is enabled.
-  caCert:
-  # -- Alertmanager endpoint URL. e.g. `https://alertmanager.greenhouse.example.com/api/v2`.
-  endpoint:
-  # -- Ingress configuration for Alertmanager UI.
-  ingress:
-    # -- Hostname for the Alertmanager ingress. e.g. `alertmanager.greenhouse.example.com`.
-    host:
-  # -- Slack routing configuration.
-  slack:
-    # -- Slack routes list. Each entry requires `channel`, `name`, and `webhookURL`.
-    routes: []
-    # - channel: '#my-channel'
-    #   name: my-route
-    #   webhookURL:
-  filterLabels:
-    - app
-    - service
-    - severity
-    - organization
-  silenceExcludedLabels:
-    - pod
-    - pod_name
-    - instance
-  silenceTemplates: []
-  predefinedFilters: []
-  # -- Alertmanager deployment options.
-  alertmanager:
-    # -- Whether to deploy the alertmanager.
-    enabled: false
-
-# -- Configures the logshipping plugin for Fluent Bit based log forwarding.
-logshipping:
-  # -- Enable the logshipping plugin.
-  enabled: false
-  # -- Support group label.
-  supportGroup: observability
-  fluent-bit:
-    image:
-      # -- Fluent Bit image repository.
-      repository: cr.fluentbit.io/fluent/fluent-bit
-    hotReload:
-      image:
-        # -- configmap-reload image repository.
-        repository: ghcr.io/jimmidyson/configmap-reload
-  # -- Additional key/value pairs passed as fluent-bit additionalValues.
-  # additionalValues: []
-
-# -- Configures the OpenTelemetry plugin for logs and metrics collection.
-openTelemetry:
-  # -- Enable the OpenTelemetry plugin.
-  enabled: false
-  # -- Disable the otel-operator self-managed NetworkPolicy feature gates (operator/operand.networkpolicy).
-  disableOperatorNetworkPolicy: false
-  # -- Support group label.
-  supportGroup: observability
-  # -- Region label attached to telemetry data.
-  # region:
-  # -- Cluster label attached to telemetry data.
-  # cluster:
-  # -- OpenSearch logs endpoint and credentials.
-  # openSearchLogs:
-  #   endpoint:
-  #   failover_username_a:
-  #   failover_password_a:
-  #   failover_username_b:
-  #   failover_password_b:
-  #   index:
-  logsCollector:
-    enabled: true
-  metricsCollector:
-    enabled: true
-  prometheus:
-    podMonitor:
-      enabled: true
-    serviceMonitor:
-      enabled: true
-  admissionWebhooks:
-    certManager:
-      enabled: true
-    autoGenerateCert:
-      enabled: false
-      recreate: false
-  kubeRBACProxy:
-    enabled: false
-  manager:
-    prometheusRule:
-      defaultRules:
-        enabled: false
-      enabled: false
-
-# -- Configures the Perses plugin for dashboard management.
-perses:
-  # -- Enable the Perses plugin.
-  enabled: true
-  # -- Support group label.
-  supportGroup: observability
-  ingress:
-    # -- Add the `disco: "true"` annotation to the Perses ingress (OpenStack Designate DNS registration).
-    discoEnabled: false
-
-# -- Configures the Shoot Grafter plugin for grafting resources onto Gardener Shoot clusters.
-shootgrafter:
-  # -- Enable the Shoot Grafter plugin.
-  enabled: true
-  # -- Support group label.
-  supportGroup: default
-
-# -- Configures the Repo Guard plugin for repository compliance enforcement.
-repoguard:
-  # -- Enable the Repo Guard plugin.
-  enabled: false
-  # -- Enable the repo-guard manager component.
-  # manager:
-  #   enabled: false
-  # -- Enable the Perses integration for repo-guard.
-  # perses:
-  #   enabled: false
-
-# -- Configures the Permission Manager plugin for Kubernetes RBAC management.
-permissionmanager:
-  # -- Enable the Permission Manager plugin.
-  enabled: false
-  # -- CCRN API groups configuration.
-  # ccrn:
-  #   apiGroups: []
-  # -- Provider enablement flags.
-  # providers:
-  #   kubernetes: "true"
-  #   github: "false"
-  # -- Manager tuning options.
-  # manager:
-  #   maxConcurrentReconciles: 5
-
-# -- Configures the Gatekeeper plugin for OPA-based policy enforcement.
-gatekeeper:
-  # -- Enable the Gatekeeper plugin.
-  enabled: false
+  # -- Annotations applied to each PrometheusRule.
   annotations: {}
-  # -- Validating webhook object selector to exclude system namespaces.
-  # validatingWebhookObjectSelector: {}
-
-# -- Configures the k8s Gateway API plugin (installs Gateway API CRDs).
-k8sGatewayApi:
-  # -- Enable the k8s Gateway API plugin.
-  enabled: false
-
-# -- Configures the kgateway controller plugin.
-kgateway:
-  # -- Enable the kgateway plugin.
-  enabled: false
-  controller:
-    # -- Number of kgateway controller replicas.
-    replicaCount: 1
-    serviceMonitor:
-      # -- Enable ServiceMonitor for kgateway controller metrics.
-      enabled: false
-
-# -- Configures the kgateway CRDs plugin.
-kgatewayCrds:
-  # -- Enable the kgateway CRDs plugin.
-  enabled: false
+  # -- Labels applied to each PrometheusRule (plugin selects on these).
+  labels:
+    app: operator
+    role: alert-rules
+    plugin: kube-monitoring

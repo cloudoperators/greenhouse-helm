@@ -1,0 +1,56 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- range $name, $plugin := .Values.plugins }}
+{{- $plugin = $plugin | default dict }}
+---
+apiVersion: greenhouse.sap/v1alpha1
+kind: Plugin
+metadata:
+  name: {{ $plugin.name | default $name }}
+  namespace: {{ $.Release.Namespace }}
+  {{- with $plugin.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    greenhouse.sap/owned-by: {{ $plugin.supportGroup | default $.Values.global.supportGroup }}
+    {{- with $plugin.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- with $plugin.displayName }}
+  displayName: {{ . }}
+  {{- end }}
+  pluginDefinitionRef:
+    kind: {{ $plugin.pluginDefinition.kind | default "PluginDefinition" }}
+    name: {{ required (printf "plugins.%s.pluginDefinition.name is required" $name) $plugin.pluginDefinition.name }}
+  {{- with $plugin.clusterName }}
+  clusterName: {{ . }}
+  {{- end }}
+  {{- with $plugin.deletionPolicy }}
+  deletionPolicy: {{ . }}
+  {{- end }}
+  {{- with $plugin.releaseName }}
+  releaseName: {{ . }}
+  {{- end }}
+  {{- with $plugin.releaseNamespace }}
+  releaseNamespace: {{ . }}
+  {{- end }}
+  {{- with $plugin.ignoreDifferences }}
+  ignoreDifferences:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $plugin.optionValues }}
+  {{- $ov := . }}
+  {{- if typeIs "string" . }}{{- $ov = tpl . $ | fromYaml }}{{- end }}
+  optionValues:
+    {{- include "flattenOptionValues" (dict "prefix" "" "values" $ov) | nindent 4 }}
+  {{- end }}
+{{- range $plugin.extraObjects }}
+---
+{{ if typeIs "string" . }}{{- tpl . $ }}{{ else }}{{- tpl (toYaml .) $ }}{{ end }}
+{{- end }}
+{{- end }}
