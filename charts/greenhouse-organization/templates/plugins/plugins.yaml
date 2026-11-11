@@ -22,7 +22,7 @@ metadata:
     {{- end }}
 spec:
   {{- with $plugin.displayName }}
-  displayName: {{ . }}
+  displayName: {{ . | quote }}
   {{- end }}
   pluginDefinitionRef:
     kind: {{ $plugin.pluginDefinition.kind | default "PluginDefinition" }}

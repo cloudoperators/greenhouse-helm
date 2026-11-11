@@ -15,7 +15,7 @@ metadata:
     greenhouse.sap/support-group: "true"
 {{- end }}
 spec:
-  description: {{ $admin.description | default "Greenhouse Admin Team" }}
+  description: {{ $admin.description | default "Greenhouse Admin Team" | quote }}
   mappedIdPGroup: {{ required "organization.mappedOrgAdminIdPGroup is required" .Values.organization.mappedOrgAdminIdPGroup }}
 {{- range $teamName, $team := .Values.organization.additionalTeams }}
 ---
@@ -29,7 +29,7 @@ metadata:
     greenhouse.sap/support-group: "true"
 {{- end }}
 spec:
-  description: {{ $team.description | default (printf "Team %s" $teamName) }}
+  description: {{ $team.description | default (printf "Team %s" $teamName) | quote }}
   mappedIdPGroup: {{ required "Team mappedIdPGroup is missing" $team.mappedIdPGroup }}
 {{- end }}
 {{- end }}
