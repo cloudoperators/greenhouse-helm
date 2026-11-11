@@ -8,7 +8,7 @@
 replicaCount: 2
 # If set the token returned by the IDProxy will contain the Greenhouse groups
 # and all groups returned by the upstream idp
-keepUpstreamGroups: true
+keepUpstreamGroups: false
 
 # CORS allowed origins for the IdP proxy. "*" allows any origin.
 corsAllowedOrigins:
