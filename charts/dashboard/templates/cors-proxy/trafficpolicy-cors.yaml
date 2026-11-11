@@ -19,8 +19,13 @@ spec:
       name: {{ include "dashboard.corsProxy.fullname" . }}
   cors:
     allowCredentials: {{ .Values.dashboard.corsProxy.cors.allowCredentials }}
+    # The dashboard SPA origin is always allowed first; any configured
+    # allowOrigins are appended after it.
     allowOrigins:
-      {{- toYaml .Values.dashboard.corsProxy.cors.allowOrigins | nindent 6 }}
+      - {{ printf "https://%s" (include "dashboard.hostname" .) }}
+      {{- with .Values.dashboard.corsProxy.cors.allowOrigins }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
     allowMethods:
       {{- toYaml .Values.dashboard.corsProxy.cors.allowMethods | nindent 6 }}
     allowHeaders:

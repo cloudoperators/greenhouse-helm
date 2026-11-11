@@ -10,7 +10,7 @@ dashboard:
     parentRefName: greenhouse-gateway
     cors:
       allowOrigins:
-        - "https://dashboard.greenhouse.tld"
+        - "https://extra.greenhouse.tld"
 
 image:
   tag: ""

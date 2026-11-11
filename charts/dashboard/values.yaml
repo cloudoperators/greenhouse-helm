@@ -54,13 +54,12 @@ dashboard:
     tls:
       secretName: ""
     # Native kgateway CORS policy applied to the route.
-    # Note: allowCredentials: true combined with allowOrigins: ["*"] is technically
-    # rejected by the browser CORS spec, but this is the combination that worked;
-    # tighten allowOrigins per-install (e.g. ["https://dashboard.<dnsDomain>"]).
+    # The dashboard SPA origin (https://<dashboard hostname>) is always prepended
+    # as the first allowed origin; allowOrigins here adds any further origins.
     cors:
       allowCredentials: true
-      allowOrigins:
-        - "*"
+      # Additional allowed origins, appended after the dashboard SPA origin.
+      allowOrigins: []
       allowMethods:
         - GET
         - POST
