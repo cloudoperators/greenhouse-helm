@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: greenhouse.sap/v1alpha1
+kind: ClusterPluginDefinition
+metadata:
+  name: greenhouse-organization
+spec:
+  displayName: Greenhouse Organization
+  description: >-
+    Resources required to run a Greenhouse admin organization — the Organization,
+    Teams, RBAC, Catalogs and optional extension Plugins.
+  version: "0.1.0"
+  helmChart:
+    name: greenhouse-organization
+    repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
+    version: 0.1.0
+  options:
+    - name: global.dnsDomain
+      displayName: DNS domain
+      description: Base DNS domain for this Greenhouse installation.
+      required: true
+      type: string
+    - name: organization.mappedOrgAdminIdPGroup
+      displayName: Admin IdP group
+      description: IdP group mapped to the organization's admins. Always required.
+      required: true
+      type: string

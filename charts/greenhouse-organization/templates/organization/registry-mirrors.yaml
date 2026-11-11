@@ -1,0 +1,34 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- $mirror := .Values.organization.mirror | default dict }}
+{{- if and $mirror $mirror.enabled }}
+{{- if $mirror.registryMirrors }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-mirrors
+data:
+  containerRegistryConfig: |
+{{- if and $mirror.registryAuth $mirror.registryAuth.secretName }}
+    secretName: {{ $mirror.registryAuth.secretName }}
+{{- end }}
+    primaryMirror: {{ required "organization.mirror.primary is required" $mirror.primary }}
+    registryMirrors:
+  {{- $mirror.registryMirrors | toYaml | nindent 6 }}
+{{- end }}
+{{- if and $mirror.registryAuth $mirror.registryAuth.secretName }}
+---
+apiVersion: v1
+data:
+  username: {{ required "organization.mirror.registryAuth.username is required when secretName is set" $mirror.registryAuth.username | b64enc  }}
+  password: {{ required "organization.mirror.registryAuth.password is required when secretName is set" $mirror.registryAuth.password | b64enc  }}
+kind: Secret
+metadata:
+  name: {{ $mirror.registryAuth.secretName }}
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+{{- end }}
+{{- end }}

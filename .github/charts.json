@@ -20,6 +20,10 @@
     "chartDir": "charts/greenhouse"
   },
   {
+    "name": "greenhouse-organization",
+    "chartDir": "charts/greenhouse-organization"
+  },
+  {
     "name": "oidc-discovery",
     "chartDir": "charts/oidc-discovery"
   }

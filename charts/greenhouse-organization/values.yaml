@@ -1,0 +1,116 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+global:
+  # -- The DNS domain to be used for all Greenhouse components. e.g. `greenhouse.example.com`.
+  dnsDomain:
+  # -- Default support group label (greenhouse.sap/owned-by) applied to resources.
+  supportGroup: "default"
+
+# -- Organization CR configuration.
+organization:
+  # -- Enable the Organization CR.
+  enabled: true
+  # -- Annotations added to the Organization CR.
+  annotations: {}
+  # -- Labels added to the Organization CR.
+  labels: {}
+  # -- IdP group mapped to the organization admins (Organization spec.mappedOrgAdminIdPGroup
+  # and the admin Team's mappedIdPGroup). Required.
+  mappedOrgAdminIdPGroup:
+  # -- The admin Team CR (always rendered as team "admin"). mappedIdPGroup is mappedOrgAdminIdPGroup above.
+  adminTeam:
+    # -- Admin Team description.
+    description: Greenhouse Admin Team
+    # -- Label the admin Team as a support group.
+    isSupportGroup: false
+  # -- Additional Team CRs mapped to IdP groups (besides the admin team). Each key is a team name.
+  additionalTeams: {}
+    # example-team:
+    #   description:
+    #   mappedIdPGroup:        # required
+    #   isSupportGroup: false
+  # -- OIDC configuration for the organization's federation to the external identity provider.
+  oidc:
+    # -- Enable OIDC authentication on the Organization. When true, issuer/clientID/clientSecret are required.
+    enabled: false
+    # -- OIDC issuer URL of the external identity provider. e.g. `https://<tenant>.example.com`.
+    issuer:
+    # -- OIDC redirect URL. Defaults to `https://auth.<dnsDomain>` when unset.
+    redirectURL:
+    # -- OIDC client ID registered with the external identity provider.
+    clientID:
+    # -- OIDC client secret registered with the external identity provider.
+    clientSecret:
+  # -- OAuth2 client redirect URIs registered on the organization.
+  oauth2ClientRedirectURIs:
+    - "http://localhost:8000"
+    - "http://localhost:18000"
+  # -- SCIM group synchronization configuration.
+  scim:
+    # -- Enable SCIM sync.
+    enabled: false
+    # -- SCIM base URL (required when enabled).
+    # baseURL:
+    # -- Auth type: "basic" (default) or "token".
+    # authType: basic
+    # -- Basic auth username (required when authType is "basic").
+    # username:
+    # -- Basic auth password (required when authType is "basic").
+    # password:
+    # -- Bearer token (required when authType is "token").
+    # bearerToken:
+    # -- Bearer header name (optional, authType "token" only).
+    # bearerHeader:
+    # -- Bearer token prefix (optional, authType "token" only).
+    # bearerPrefix:
+  # -- RBAC objects delivered verbatim from values. Role/RoleBinding are forced into the release namespace.
+  rbac:
+    # -- Enable rendering of the RBAC objects below.
+    enabled: false
+    # -- Annotations merged into every rendered RBAC object.
+    annotations: {}
+    # -- Labels merged into every rendered RBAC object.
+    labels: {}
+    # -- ClusterRole objects, each a full manifest.
+    clusterRoles: []
+    # -- Role objects, each a full manifest.
+    roles: []
+    # -- ClusterRoleBinding objects, each a full manifest.
+    clusterRoleBindings: []
+    # -- RoleBinding objects, each a full manifest.
+    roleBindings: []
+  # -- OCI registry mirror configuration for the organization.
+  mirror:
+    # -- Enable the registry mirror ConfigMap and auth Secret.
+    enabled: false
+    # -- Primary OCI registry mirror. Required when registryMirrors is set.
+    primary:
+    # -- OCI registry authentication secret.
+    registryAuth: {}
+    #   secretName:
+    #   username:
+    #   password:
+    # -- Per-registry mirror overrides (docker.io, ghcr.io, gcr.io, quay.io, registry.k8s.io, etc.).
+    registryMirrors: {}
+
+# -- Catalog CRs rendered by templates/catalogs/catalogs.yaml. Each key is the catalog name.
+# Supports optional `labels`, `annotations`, `sources`, and `extraObjects` (string or map, tpl-rendered).
+catalogs: {}
+
+### Configure several Plugins for the Greenhouse organization below.
+
+# -- Greenhouse Plugin CRs, rendered by templates/plugins/plugins.yaml. Each key is a plugin.
+plugins: {}
+
+# -- Deploy the bundled Flux observability: state-metrics ConfigMap, PrometheusRule alerts, and perses dashboards.
+fluxAlerts:
+  # -- Enable the bundled Flux state-metrics ConfigMap, PrometheusRule alerts, and dashboards.
+  enabled: false
+  # -- Annotations applied to each PrometheusRule.
+  annotations: {}
+  # -- Labels applied to each PrometheusRule (plugin selects on these).
+  labels:
+    app: operator
+    role: alert-rules
+    plugin: kube-monitoring
