@@ -1,0 +1,29 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- range $name, $catalog := .Values.catalogs }}
+{{- $catalog = $catalog | default dict }}
+---
+apiVersion: greenhouse.sap/v1alpha1
+kind: Catalog
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Release.Namespace }}
+  {{- with $catalog.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with $catalog.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  sources:
+    {{- toYaml $catalog.sources | nindent 4 }}
+{{- range $catalog.extraObjects }}
+---
+{{ if typeIs "string" . }}{{- tpl . $ }}{{ else }}{{- tpl (toYaml .) $ }}{{ end }}
+{{- end }}
+{{- end }}

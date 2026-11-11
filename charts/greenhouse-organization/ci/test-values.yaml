@@ -1,0 +1,212 @@
+# SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+global:
+  dnsDomain: example.com
+  supportGroup: default
+
+organization:
+  enabled: true
+  mappedOrgAdminIdPGroup: org-admins
+  adminTeam:
+    description: The Admin Team
+    isSupportGroup: true
+  additionalTeams:
+    example-team:
+      description: The Example Team
+      mappedIdPGroup: team-example
+      isSupportGroup: true
+  oidc:
+    enabled: true
+    issuer: https://oidc.example.com
+    clientID: test-client-id
+    clientSecret: test-client-secret
+  oauth2ClientRedirectURIs:
+    - http://localhost:8000
+  rbac:
+    enabled: true
+    annotations:
+      helm.sh/resource-policy: keep
+    clusterRoleBindings:
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: greenhouse:cluster-admin
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-admin
+        subjects:
+          - apiGroup: rbac.authorization.k8s.io
+            kind: Group
+            name: org-admins
+
+catalogs:
+  greenhouse-extensions:
+    sources:
+      - repository: https://github.com/cloudoperators/greenhouse-extensions
+        ref:
+          branch: main
+        resources:
+          - cert-manager/plugindefinition.yaml
+
+# Enable the ingress plugin.
+ingress:
+  enabled: true
+
+# Enable the perses plugin.
+perses:
+  enabled: true
+
+# Generic plugins (templates/plugins/plugins.yaml).
+plugins:
+  k8s-gateway-api:
+    displayName: k8s-gateway-api
+    pluginDefinition:
+      name: k8s-gateway-api
+    releaseName: k8s-gateway-api
+    releaseNamespace: greenhouse
+  kgateway-crds:
+    displayName: kgateway-crds
+    pluginDefinition:
+      name: kgateway-crds
+    releaseName: kgateway-crds
+    releaseNamespace: kgateway-system
+  cert-manager:
+    pluginDefinition:
+      name: cert-manager
+    optionValues: |
+      cert-manager:
+        config:
+          _raw:
+            enableGatewayAPI: true
+            featureGates:
+              ListenerSets: true
+        webhook:
+          timeoutSeconds: 15
+  perses:
+    displayName: perses
+    supportGroup: observability
+    pluginDefinition:
+      name: perses
+    optionValues: |
+      perses:
+        ingress:
+          enabled: true
+          ingressClassName: nginx
+          annotations:
+            _raw:
+              kubernetes.io/tls-acme: "true"
+          hosts:
+            _raw:
+              - host: "perses.{{ .Values.global.dnsDomain }}"
+                paths:
+                  - path: /
+                    pathType: Prefix
+  shoot-grafter:
+    displayName: Shoot Grafter
+    pluginDefinition:
+      kind: ClusterPluginDefinition
+      name: shoot-grafter
+    releaseName: shoot-grafter
+    releaseNamespace: greenhouse
+  alerts:
+    displayName: Alerts
+    supportGroup: observability
+    pluginDefinition:
+      name: supernova
+    optionValues: |
+      endpoint: https://alertmanager.{{ .Values.global.dnsDomain }}/api/v2
+      alerts:
+        alertmanager:
+          enabled: false
+          ingress:
+            hosts:
+              _raw:
+                - alertmanager.{{ .Values.global.dnsDomain }}
+    extraObjects:
+      - |
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: ingress-ca-cert
+        data:
+          ca.crt: {{ "example-ca" | b64enc | quote }}
+  logs:
+    name: logs-greenhouse
+    supportGroup: observability
+    pluginDefinition:
+      name: logs
+    ignoreDifferences:
+      - version: v1
+        kind: ServiceAccount
+        name: logs-collector
+        paths:
+          - /metadata/labels
+    optionValues: |
+      openTelemetry:
+        prometheus:
+          additionalLabels:
+            _raw:
+              plugin: kube-monitoring
+        openSearchLogs:
+          endpoint: https://opensearch.example.com:9200
+          index: logs
+          failover_username_a:
+            _valueFrom:
+              secret:
+                key: failover_username_a
+                name: otel-basic-auth-users
+    extraObjects:
+      - |
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: otel-basic-auth-users
+          namespace: {{ .Release.Namespace }}
+          labels:
+            greenhouse.sap/owned-by: observability
+        data:
+          failover_username_a: {{ "data" | b64enc }}
+  kube-monitoring:
+    supportGroup: observability
+    pluginDefinition:
+      name: kube-monitoring
+    optionValues: |
+      kubeMonitoring:
+        prometheus:
+          ingress:
+            annotations:
+              nginx.ingress.kubernetes.io/auth-tls-secret: greenhouse/kube-monitoring-ingress-ca
+            enabled: true
+            hosts:
+              _raw:
+                - prometheus.{{ .Values.global.dnsDomain }}
+        kube-state-metrics:
+          customResourceState:
+            enabled: true
+            name: flux-system
+          rbac:
+            extraRules:
+              _raw:
+                - apiGroups:
+                    - source.toolkit.fluxcd.io
+                    - kustomize.toolkit.fluxcd.io
+                    - helm.toolkit.fluxcd.io
+                  resources:
+                    - gitrepositories
+                    - helmreleases
+                    - kustomizations
+                  verbs: [list, watch]
+      alerts:
+        enabled: true
+    extraObjects:
+      - |
+        apiVersion: v1
+        kind: Secret
+        type: Opaque
+        metadata:
+          name: thanos-metrics-objectstore
+          namespace: {{ .Release.Namespace }}
+        data:
+          thanos.yaml: {{ "type: SWIFT" | b64enc | quote }}

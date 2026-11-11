@@ -1,0 +1,69 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- if .Values.organization.enabled }}
+apiVersion: greenhouse.sap/v1alpha1
+kind: Organization
+metadata:
+  name: {{ .Release.Namespace }}
+  {{- with .Values.organization.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.organization.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  description: Greenhouse organization
+  mappedOrgAdminIdPGroup: {{ required "organization.mappedOrgAdminIdPGroup is required" .Values.organization.mappedOrgAdminIdPGroup }}
+{{- if and .Values.organization.mirror .Values.organization.mirror.enabled .Values.organization.mirror.registryMirrors }}
+  configMapRef: registry-mirrors
+{{- end }}
+{{- if or .Values.organization.oidc.enabled .Values.organization.scim.enabled }}
+  authentication:
+{{- if .Values.organization.oidc.enabled }}
+    oidc:
+      issuer: {{ required ".Values.organization.oidc.issuer missing" .Values.organization.oidc.issuer }}
+      redirectURI: {{ default (printf "https://%s" ( include "idproxy.auth.hostname" .)) .Values.organization.oidc.redirectURL }}
+      clientIDReference:
+        name: {{ .Release.Namespace }}-auth
+        key: oidcClientID
+      clientSecretReference:
+        name: {{ .Release.Namespace }}-auth
+        key: oidcClientSecret
+    {{- if .Values.organization.oauth2ClientRedirectURIs }}
+      oauth2ClientRedirectURIs:
+        {{- .Values.organization.oauth2ClientRedirectURIs | toYaml | nindent 10 }}
+    {{- end -}}
+{{- end }}
+{{- if .Values.organization.scim.enabled }}
+    scim:
+      baseURL: {{ required ".Values.organization.scim.baseURL" .Values.organization.scim.baseURL }}
+      authType: {{ .Values.organization.scim.authType | default "basic" }}
+{{- if eq (.Values.organization.scim.authType | default "basic") "token" }}
+      bearerToken:
+        secret:
+          name: {{ .Release.Namespace }}-auth
+          key: scimBearerToken
+{{- with .Values.organization.scim.bearerHeader }}
+      bearerHeader: {{ . }}
+{{- end }}
+{{- with .Values.organization.scim.bearerPrefix }}
+      bearerPrefix: {{ . }}
+{{- end }}
+{{- else }}
+      basicAuthUser:
+        secret:
+          name: {{ .Release.Namespace }}-auth
+          key: scimBasicAuthUser
+      basicAuthPw:
+        secret:
+          name: {{ .Release.Namespace }}-auth
+          key: scimBasicAuthPassword
+{{- end }}
+{{ end }}
+{{ end }}
+{{ end }}

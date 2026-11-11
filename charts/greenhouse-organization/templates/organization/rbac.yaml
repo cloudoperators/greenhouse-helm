@@ -1,0 +1,19 @@
+{{/*
+SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
+SPDX-License-Identifier: Apache-2.0
+*/}}
+
+{{- $rbac := .Values.organization.rbac | default dict }}
+{{- if and $rbac $rbac.enabled }}
+{{- $meta := dict "annotations" ($rbac.annotations | default dict) "labels" ($rbac.labels | default dict) }}
+{{- range concat ($rbac.clusterRoles | default list) ($rbac.clusterRoleBindings | default list) }}
+---
+{{- $obj := mergeOverwrite (deepCopy .) (dict "metadata" $meta) }}
+{{ toYaml $obj }}
+{{- end }}
+{{- range concat ($rbac.roles | default list) ($rbac.roleBindings | default list) }}
+---
+{{- $obj := mergeOverwrite (deepCopy .) (dict "metadata" (merge (dict "namespace" $.Release.Namespace) $meta)) }}
+{{ toYaml $obj }}
+{{- end }}
+{{- end }}
