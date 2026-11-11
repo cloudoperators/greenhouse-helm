@@ -13,6 +13,10 @@ global:
   # Required — no default.
   dnsDomain: ""
 
+  # Sub-domain for the Kubernetes API hostname (<kubeAPISubDomain>.<dnsDomain>).
+  # Empty defaults to "api".
+  kubeAPISubDomain: ""
+
   dex:
     # Dex storage backend. Use "kubernetes" (CRD-based, no external DB) or
     # "postgres" (requires a PostgreSQL instance configured below).
