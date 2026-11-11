@@ -11,6 +11,10 @@ global:
 organization:
   # -- Enable the Organization CR.
   enabled: true
+  # -- Annotations added to the Organization CR.
+  annotations: {}
+  # -- Labels added to the Organization CR.
+  labels: {}
   # -- IdP group mapped to the organization admins (Organization spec.mappedOrgAdminIdPGroup
   # and the admin Team's mappedIdPGroup). Required.
   mappedOrgAdminIdPGroup:

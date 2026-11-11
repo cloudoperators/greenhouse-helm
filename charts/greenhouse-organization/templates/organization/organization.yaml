@@ -8,6 +8,14 @@ apiVersion: greenhouse.sap/v1alpha1
 kind: Organization
 metadata:
   name: {{ .Release.Namespace }}
+  {{- with .Values.organization.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- with .Values.organization.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   description: Greenhouse organization
   mappedOrgAdminIdPGroup: {{ required "organization.mappedOrgAdminIdPGroup is required" .Values.organization.mappedOrgAdminIdPGroup }}
