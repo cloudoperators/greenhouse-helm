@@ -3,75 +3,18 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if or .Values.organization.oidc.enabled .Values.scim.enabled }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ .Release.Namespace }}-auth
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/resource-policy": keep
-type: greenhouse.sap/orgsecret
-data:
-{{- if .Values.organization.oidc.enabled }}
-  oidcClientID: {{ required ".Values.organization.oidc.clientID missing" .Values.organization.oidc.clientID | b64enc }}
-  oidcClientSecret: {{ required ".Values.organization.oidc.clientSecret missing" .Values.organization.oidc.clientSecret | b64enc }}
-{{ end }}
-{{- if .Values.scim.enabled }}
-{{- if eq (.Values.scim.authType | default "basic") "token" }}
-  scimBearerToken: {{ required ".Values.scim.bearerToken is required when scim.authType is token" .Values.scim.bearerToken | b64enc }}
-{{- else }}
-  scimBasicAuthUser: {{ required ".Values.scim.username is required when scim.authType is basic" .Values.scim.username | b64enc }}
-  scimBasicAuthPassword: {{ required ".Values.scim.password is required when scim.authType is basic" .Values.scim.password | b64enc }}
-{{- end }}
-{{ end }}
-{{ end }}
----
-{{ if .Values.organization.registryMirrors }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: registry-mirrors
-  annotations:
-    "helm.sh/resource-policy": keep
-data:
-  containerRegistryConfig: |
-{{- if and .Values.organization.registryAuth .Values.organization.registryAuth.secretName }}
-    secretName: {{ .Values.organization.registryAuth.secretName }}
-{{- end }}
-    primaryMirror: {{ required ".Values.organization.primaryMirror is required" .Values.organization.primaryMirror }}
-    registryMirrors:
-  {{- .Values.organization.registryMirrors | toYaml | nindent 6 }}
-{{ end }}
----
-{{- if and .Values.organization.registryAuth .Values.organization.registryAuth.secretName }}
-apiVersion: v1
-data:
-  username: {{ required ".Values.organization.registryAuth.username is required when secretName is set" .Values.organization.registryAuth.username | b64enc  }}
-  password: {{ required ".Values.organization.registryAuth.password is required when secretName is set" .Values.organization.registryAuth.password | b64enc  }}
-kind: Secret
-metadata:
-  name: {{ .Values.organization.registryAuth.secretName }}
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/resource-policy": keep
-type: Opaque
-{{- end }}
----
-{{ if .Values.organization.enabled }}
+{{- if .Values.organization.enabled }}
 apiVersion: greenhouse.sap/v1alpha1
 kind: Organization
 metadata:
   name: {{ .Release.Namespace }}
-  annotations:
-    "helm.sh/resource-policy": keep
 spec:
   description: Greenhouse organization
-  mappedOrgAdminIdPGroup: {{ required ".Values.teams.admin.mappedIdPGroup missing" .Values.teams.admin.mappedIdPGroup }}
-{{- if .Values.organization.registryMirrors }}
+  mappedOrgAdminIdPGroup: {{ required "organization.mappedOrgAdminIdPGroup is required" .Values.organization.mappedOrgAdminIdPGroup }}
+{{- if and .Values.organization.mirror .Values.organization.mirror.enabled .Values.organization.mirror.registryMirrors }}
   configMapRef: registry-mirrors
 {{- end }}
-{{- if or .Values.organization.oidc.enabled .Values.scim.enabled }}
+{{- if or .Values.organization.oidc.enabled .Values.organization.scim.enabled }}
   authentication:
 {{- if .Values.organization.oidc.enabled }}
     oidc:
@@ -88,19 +31,19 @@ spec:
         {{- .Values.organization.oauth2ClientRedirectURIs | toYaml | nindent 10 }}
     {{- end -}}
 {{- end }}
-{{- if .Values.scim.enabled }}
+{{- if .Values.organization.scim.enabled }}
     scim:
-      baseURL: {{ required ".Values.scim.baseURL" .Values.scim.baseURL }}
-      authType: {{ .Values.scim.authType | default "basic" }}
-{{- if eq (.Values.scim.authType | default "basic") "token" }}
+      baseURL: {{ required ".Values.organization.scim.baseURL" .Values.organization.scim.baseURL }}
+      authType: {{ .Values.organization.scim.authType | default "basic" }}
+{{- if eq (.Values.organization.scim.authType | default "basic") "token" }}
       bearerToken:
         secret:
           name: {{ .Release.Namespace }}-auth
           key: scimBearerToken
-{{- with .Values.scim.bearerHeader }}
+{{- with .Values.organization.scim.bearerHeader }}
       bearerHeader: {{ . }}
 {{- end }}
-{{- with .Values.scim.bearerPrefix }}
+{{- with .Values.organization.scim.bearerPrefix }}
       bearerPrefix: {{ . }}
 {{- end }}
 {{- else }}

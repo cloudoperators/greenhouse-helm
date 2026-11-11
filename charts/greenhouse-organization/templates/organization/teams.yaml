@@ -3,22 +3,33 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{ if .Values.organization.enabled }}
-{{ range $teamName, $team := .Values.teams }}
+{{- if .Values.organization.enabled }}
+{{- $admin := .Values.organization.adminTeam | default dict }}
+apiVersion: greenhouse.sap/v1alpha1
+kind: Team
+metadata:
+  name: admin
+  namespace: {{ .Release.Namespace }}
+{{- if $admin.isSupportGroup }}
+  labels:
+    greenhouse.sap/support-group: "true"
+{{- end }}
+spec:
+  description: {{ $admin.description | default "Greenhouse Admin Team" }}
+  mappedIdPGroup: {{ required "organization.mappedOrgAdminIdPGroup is required" .Values.organization.mappedOrgAdminIdPGroup }}
+{{- range $teamName, $team := .Values.organization.additionalTeams }}
 ---
 apiVersion: greenhouse.sap/v1alpha1
 kind: Team
 metadata:
   name: {{ required "Team name missing" $teamName | lower }}
   namespace: {{ $.Release.Namespace }}
-  annotations:
-    "helm.sh/resource-policy": keep
-{{ if $team.isSupportGroup }}
+{{- if $team.isSupportGroup }}
   labels:
     greenhouse.sap/support-group: "true"
-{{ end -}}
+{{- end }}
 spec:
   description: {{ $team.description | default (printf "Team %s" $teamName) }}
-  mappedIdPGroup: {{ required "Team mappedGroupID is missing" $team.mappedIdPGroup }}
+  mappedIdPGroup: {{ required "Team mappedIdPGroup is missing" $team.mappedIdPGroup }}
 {{- end }}
-{{ end }}
+{{- end }}
