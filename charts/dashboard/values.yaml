@@ -14,8 +14,11 @@ global:
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
-  # Overrides the image tag to use a specific digest instead
-  digest: sha256:b132e10c45a4f4b23490aca88c652a73f444885443de57edbf7f72576ba03822
+  # Image tag. Defaults to the chart's appVersion when unset.
+  tag: ""
+  # Optional. Pin a specific image by digest (sha256:...). When set, the digest
+  # takes precedence over tag.
+  digest: ""
   pullPolicy: IfNotPresent
 
 replicas: 2
