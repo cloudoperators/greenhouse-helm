@@ -2,9 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 global:
   dnsDomain: greenhouse.tld
+  gateway:
+    parentRefName: greenhouse-gateway
 
 dashboard:
   authClientId: topSecret!
+  corsProxy:
+    enabled: true
+    cors:
+      allowOrigins:
+        - "https://extra.greenhouse.tld"
 
 image:
   tag: ""
