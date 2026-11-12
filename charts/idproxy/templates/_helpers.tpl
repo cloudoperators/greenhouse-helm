@@ -83,7 +83,7 @@ Create the name of the service account to use
 Define postgresql helpers
 */}}
 {{- define "featureFlag.fullname" -}}
-  {{- .Values.featureFlagsConfigMap | default (printf "%s-feature-flags" .Release.Name) | trunc 48 | replace "_" "-" -}}
+  {{- required "featureFlagsConfigMap is required" .Values.featureFlagsConfigMap | trunc 48 | replace "_" "-" -}}
 {{- end -}}
 {{/* Render the backend */}}
 {{- define "dex.backend" -}}

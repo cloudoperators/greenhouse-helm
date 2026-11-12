@@ -56,7 +56,7 @@ spec:
           command:
             - /idproxy
             - --issuer=https://{{include "idproxy.auth.hostname" $}}
-            {{- range $origin := .Values.corsAllowedOrigins | default (list "*") }}
+            {{- range $origin := .Values.corsAllowedOrigins }}
             - --allowed-origins={{ $origin }}
             {{- end }}
             - --keep-upstream-groups={{ .Values.keepUpstreamGroups }}
@@ -65,14 +65,14 @@ spec:
           - name: PG_DATABASE
             value: {{ .Values.global.dex.postgresql.postgresqlDatabase }}
           - name: PG_HOST
-            value: {{ .Values.global.dex.postgresql.postgresqlHost | default (printf "%s-postgresql" .Release.Name) }}
+            value: {{ required "global.dex.postgresql.postgresqlHost is required" .Values.global.dex.postgresql.postgresqlHost }}
           - name: PG_USER
             value: {{ .Values.global.dex.postgresql.postgresqlUsername }}
           - name: PG_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: postgres-password
-                name: {{ .Values.global.dex.postgresql.postgresqlSecretName | default (printf "%s-pguser-%s" .Release.Name .Values.global.dex.postgresql.postgresqlUsername) }}
+                name: {{ required "global.dex.postgresql.postgresqlSecretName is required" .Values.global.dex.postgresql.postgresqlSecretName }}
           {{- end }}
           - name: FEATURE_FLAGS
             value: {{ template "featureFlag.fullname" . }}
