@@ -9,11 +9,11 @@ spec:
   displayName: Dashboard
   description: >-
     Greenhouse dashboard — the web UI for viewing and managing the Greenhouse platform.
-  version: "0.3.0"
+  version: "0.4.0"
   helmChart:
     name: dashboard
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.3.0
+    version: 0.4.0
   options:
     - name: global.dnsDomain
       displayName: DNS domain
