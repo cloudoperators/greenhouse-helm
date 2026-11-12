@@ -5,7 +5,7 @@ apiVersion: v2
 type: application
 description: A Helm chart for hosting the dashboard
 name: dashboard
-version: 0.2.0
+version: 0.3.0
 
 maintainers:
   - name: abhijith-darshan
