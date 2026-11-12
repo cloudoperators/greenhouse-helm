@@ -4,6 +4,13 @@ global:
   dnsDomain: ""
   # -- Sub-domain for the Kubernetes API hostname (<kubeAPISubDomain>.<dnsDomain>). Empty defaults to "api".
   kubeAPISubDomain: ""
+  # -- In-cluster hostname of the Kubernetes API server, used as the static Backend target for the gateway cors-proxy.
+  apiserverHostname: "kubernetes.default.svc"
+  # Externally provided Gateway that the dashboard and cors-proxy ListenerSets attach to.
+  # Shared across the Greenhouse charts that expose services through the gateway.
+  gateway:
+    parentRefName: ""
+    parentRefNamespace: ""
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
@@ -14,6 +21,9 @@ image:
 replicas: 2
 
 ingress:
+  # Render the legacy Kubernetes Ingress. Disabled by default in favour of the
+  # gateway-based exposure (dashboard.gateway).
+  enabled: false
   className: nginx
 
 dashboard:
@@ -24,7 +34,73 @@ dashboard:
   # (dashboard.<dnsDomain>, auth.<dnsDomain>, api.<dnsDomain>).
   # hostname: ""
   # authHostname: ""
-  # apiHostname: ""
+  # -- Bare host for the Kubernetes API. When unset, defaults to
+  # <global.kubeAPISubDomain|"api">.<global.dnsDomain>. This is the host the
+  # dashboard calls (apiEndpoint) and the host the gateway cors-proxy listens on.
+  apiHostname: ""
   # The user for demonstration purposes.
   demoUser:
     token: demo
+  # Gateway CORS proxy. Fronts the Kubernetes API server through an externally
+  # provided Gateway and applies CORS at the gateway via a native kgateway
+  # TrafficPolicy, so the dashboard SPA can call the API from the browser.
+  # The exposed hostname is the dashboard's API host (dashboard.apiHostname,
+  # else <global.kubeAPISubDomain|'api'>.<global.dnsDomain>).
+  corsProxy:
+    # Render the gateway cors-proxy resources.
+    enabled: true
+    # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
+    listenerSetAnnotations: {}
+    # Annotations placed on the HTTPRoute resource (e.g. external-dns).
+    httpRouteAnnotations: {}
+    # TLS certificate Secret name for the HTTPS listener.
+    # Defaults to <fullname>-cors-proxy-tls; cert-manager creates the Secret at this name.
+    tls:
+      secretName: ""
+    # Native kgateway CORS policy applied to the route.
+    # The dashboard SPA origins (https://<dashboard hostname> and the
+    # https://*.<dashboard hostname> wildcard, matching the dashboard Ingress
+    # hosts) are always prepended; allowOrigins here adds any further origins.
+    cors:
+      allowCredentials: true
+      # Additional allowed origins, appended after the dashboard SPA origin.
+      allowOrigins: []
+      allowMethods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      allowHeaders:
+        - Authorization
+        - Content-Type
+        - Accept
+      exposeHeaders:
+        - Content-Length
+      maxAge: 86400
+    # Request timeouts applied to the API-server route via the kgateway TrafficPolicy.
+    # Long-lived API watches and log streams are otherwise cut off by the gateway's
+    # default request / stream-idle limits; 0s disables both so they stay open.
+    timeouts:
+      request: 0s
+      streamIdle: 0s
+  # Gateway-based exposure of the dashboard UI. Attaches a ListenerSet to the
+  # externally provided Gateway (global.gateway.parentRefName) and routes the
+  # dashboard host (and its "*." wildcard) to the dashboard Service. Default
+  # exposure; the legacy Ingress (ingress.enabled) is the alternative.
+  gateway:
+    # Render the gateway exposure resources.
+    enabled: true
+    # Annotations placed on the ListenerSet resource. Use these to drive cert
+    # provisioning (e.g. a cert-manager issuer), the same way ingress.annotations
+    # drives it for the Ingress.
+    listenerSetAnnotations: {}
+    # Annotations placed on the HTTPRoute resource (e.g. external-dns).
+    httpRouteAnnotations: {}
+    # TLS certificate Secret name for the HTTPS listeners. Both the base host and
+    # the "*.<host>" wildcard listener use this one secret, so the certificate it
+    # holds must cover BOTH names as SANs (dashboard.<dnsDomain> and *.dashboard.<dnsDomain>)
+    # Defaults to <fullname>-gateway-tls.
+    tls:
+      secretName: ""

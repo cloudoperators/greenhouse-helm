@@ -28,13 +28,28 @@ contains "dashboard". Falls back to "<release>-dashboard" otherwise.
 {{- end }}
 {{- end }}
 
+{{/* Render the bare k8s api host (no scheme). Override with .Values.dashboard.apiHostname. */}}
+{{- define "dashboard.api.host" -}}
+{{- if .Values.dashboard.apiHostname }}
+{{- .Values.dashboard.apiHostname }}
+{{- else }}
+{{- printf "%s.%s" (default "api" .Values.global.kubeAPISubDomain) (required "global.dnsDomain missing" .Values.global.dnsDomain) }}
+{{- end }}
+{{- end }}
+
 {{/* Render the k8s api hostname. Override with .Values.dashboard.apiHostname (bare host). */}}
 {{- define "dashboard.api.hostname" -}}
-{{- if .Values.dashboard.apiHostname }}
-{{- printf "https://%s" .Values.dashboard.apiHostname }}
-{{- else }}
-{{- printf "https://%s.%s" (default "api" .Values.global.kubeAPISubDomain) (required "global.dnsDomain missing" .Values.global.dnsDomain) }}
+{{- printf "https://%s" (include "dashboard.api.host" .) }}
 {{- end }}
+
+{{/* Resource name for the gateway cors-proxy sub-chart resources. */}}
+{{- define "dashboard.corsProxy.fullname" -}}
+{{- printf "%s-cors-proxy" (include "dashboard.fullname" .) }}
+{{- end }}
+
+{{/* Resource name for the gateway (dashboard exposure) sub-chart resources. */}}
+{{- define "dashboard.gateway.fullname" -}}
+{{- printf "%s-gateway" (include "dashboard.fullname" .) }}
 {{- end }}
 
 {{/*
