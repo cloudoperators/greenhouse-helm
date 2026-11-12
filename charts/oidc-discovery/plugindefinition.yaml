@@ -20,12 +20,12 @@ spec:
       description: Base DNS domain for this Greenhouse installation; the discovery endpoint is exposed at <subDomain>.<dnsDomain>.
       required: true
       type: string
-    - name: global.gateway.parentRefName
+    - name: global.gateway.name
       displayName: Parent Gateway name
       description: Name of the externally provided Gateway the discovery ListenerSet attaches to. Shared across the Greenhouse charts that attach to the gateway.
       required: true
       type: string
-    - name: global.gateway.parentRefNamespace
+    - name: global.gateway.namespace
       displayName: Parent Gateway namespace
       description: Namespace of the parent Gateway. Defaults to the release namespace when unset.
       required: false
