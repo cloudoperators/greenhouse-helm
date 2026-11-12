@@ -21,12 +21,9 @@ infrastructure:
   annotations: {}
     # external-dns.kubernetes.io/target: ingress.example.tld
 
-# Passed through verbatim as the Gateway's spec.allowedListeners, giving full
-# access to the Gateway API AllowedListeners schema. Controls which ListenerSets
-# may attach to this Gateway. The default below allows ListenerSets from the same
-# namespace; override the whole block to use a selector or widen/narrow the scope.
-# The Gateway API's own default is "from: None" (no ListenerSets attach), so this
-# default is set explicitly here rather than relying on the API default.
+# Passed through verbatim as the Gateway's spec.allowedListeners. Controls which ListenerSets
+# may attach to this Gateway. The default below allows ListenerSets from the same namespace; 
+# Override the whole block to use a selector or widen/narrow the scope.
 allowedListeners:
   namespaces:
     from: Same   # Same | All | Selector | None
