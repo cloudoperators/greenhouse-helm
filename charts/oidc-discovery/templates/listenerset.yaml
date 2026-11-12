@@ -17,8 +17,8 @@ spec:
   parentRef:
     group: gateway.networking.k8s.io
     kind: Gateway
-    name: {{ required "discovery.parentRefName is required (the externally provided Gateway to attach to)" .Values.discovery.parentRefName }}
-    {{- with .Values.discovery.parentRefNamespace }}
+    name: {{ required "global.gateway.parentRefName is required (the externally provided Gateway to attach to)" .Values.global.gateway.parentRefName }}
+    {{- with .Values.global.gateway.parentRefNamespace }}
     namespace: {{ . }}
     {{- end }}
   listeners:

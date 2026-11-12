@@ -6,8 +6,9 @@
 # parent Gateway reference.
 global:
   dnsDomain: example.com
+  gateway:
+    parentRefName: greenhouse-gateway
 
 discovery:
   enabled: true
   apiserverHostname: kubernetes.default.svc
-  parentRefName: greenhouse-gateway
