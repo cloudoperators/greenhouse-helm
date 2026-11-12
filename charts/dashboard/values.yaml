@@ -16,8 +16,7 @@ image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
   # Image tag. Defaults to the chart's appVersion when unset.
   tag: ""
-  # Optional. Pin a specific image by digest (sha256:...). When set, the digest
-  # takes precedence over tag.
+  # Optional. Pin a specific image by digest. When set, the digest takes precedence over tag.
   digest: ""
   pullPolicy: IfNotPresent
 
