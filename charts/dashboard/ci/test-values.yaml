@@ -7,7 +7,7 @@ global:
 
 dashboard:
   authClientId: topSecret!
-  corsProxy:
+  proxy:
     enabled: true
     cors:
       allowOrigins:

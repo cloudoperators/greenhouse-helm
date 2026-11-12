@@ -54,7 +54,7 @@ spec:
       required: false
       default: false
       type: bool
-    - name: dashboard.corsProxy.enabled
+    - name: dashboard.proxy.enabled
       displayName: Gateway CORS proxy
       description: Expose the Kubernetes API server through the gateway with CORS headers so the dashboard can call the API from the browser.
       required: false

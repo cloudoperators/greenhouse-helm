@@ -15,7 +15,7 @@ global:
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
   # Overrides the image tag to use a specific digest instead
-  digest: sha256:ae366951d37198d05d6b3d5859dec8181530d380ea7b9a8a8cfc5a8f07937631
+  digest: sha256:b132e10c45a4f4b23490aca88c652a73f444885443de57edbf7f72576ba03822
   pullPolicy: IfNotPresent
 
 replicas: 2
@@ -46,9 +46,9 @@ dashboard:
   # TrafficPolicy, so the dashboard SPA can call the API from the browser.
   # The exposed hostname is the dashboard's API host (dashboard.apiHostname,
   # else <global.kubeAPISubDomain|'api'>.<global.dnsDomain>).
-  corsProxy:
+  proxy:
     # Render the gateway cors-proxy resources.
-    enabled: true
+    enabled: false
     # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
     listenerSetAnnotations: {}
     # Annotations placed on the HTTPRoute resource (e.g. external-dns).

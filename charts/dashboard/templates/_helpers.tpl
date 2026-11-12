@@ -43,7 +43,7 @@ contains "dashboard". Falls back to "<release>-dashboard" otherwise.
 {{- end }}
 
 {{/* Resource name for the gateway cors-proxy sub-chart resources. */}}
-{{- define "dashboard.corsProxy.fullname" -}}
+{{- define "dashboard.proxy.fullname" -}}
 {{- printf "%s-cors-proxy" (include "dashboard.fullname" .) }}
 {{- end }}
 
