@@ -9,8 +9,8 @@ global:
   # Externally provided Gateway that the dashboard and cors-proxy ListenerSets attach to.
   # Shared across the Greenhouse charts that expose services through the gateway.
   gateway:
-    parentRefName: ""
-    parentRefNamespace: ""
+    name: ""
+    namespace: ""
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
@@ -86,7 +86,7 @@ dashboard:
       request: 0s
       streamIdle: 0s
   # Gateway-based exposure of the dashboard UI. Attaches a ListenerSet to the
-  # externally provided Gateway (global.gateway.parentRefName) and routes the
+  # externally provided Gateway (global.gateway.name) and routes the
   # dashboard host (and its "*." wildcard) to the dashboard Service. Default
   # exposure; the legacy Ingress (ingress.enabled) is the alternative.
   gateway:

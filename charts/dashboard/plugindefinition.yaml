@@ -26,7 +26,7 @@ spec:
       required: true
       default: origin
       type: string
-    - name: global.gateway.parentRefName
+    - name: global.gateway.name
       displayName: Parent Gateway name
       description: Name of the externally provided Gateway the dashboard and cors-proxy ListenerSets attach to. Required when gateway exposure or the gateway CORS proxy is enabled.
       required: false

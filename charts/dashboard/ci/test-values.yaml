@@ -3,7 +3,7 @@
 global:
   dnsDomain: greenhouse.tld
   gateway:
-    parentRefName: greenhouse-gateway
+    name: greenhouse-gateway
 
 dashboard:
   authClientId: topSecret!
