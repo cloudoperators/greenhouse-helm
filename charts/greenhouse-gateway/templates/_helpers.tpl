@@ -58,15 +58,3 @@ producer name and consumer parentRefs share one value; falls back to the fullnam
 {{- $gw := (.Values.global | default dict).gateway | default dict -}}
 {{- $gw.name | default (include "gateway.fullname" .) -}}
 {{- end }}
-
-{{/*
-Render the allowedListeners.namespaces block.
-Controls which namespaces ListenerSets may attach from.
-*/}}
-{{- define "gateway.allowedNamespaces" -}}
-{{- with .Values.allowedListeners -}}
-{{- toYaml . }}
-{{- else -}}
-from: Same
-{{- end }}
-{{- end }}

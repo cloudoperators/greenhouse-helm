@@ -21,13 +21,18 @@ infrastructure:
   annotations: {}
     # external-dns.kubernetes.io/target: ingress.example.tld
 
-# Controls which namespaces ListenerSets may attach from.
-# Rendered under spec.allowedListeners.namespaces. Defaults to "from: Same".
-allowedListeners: {}
-  # from: Same   # Same | All | Selector | None
-  # selector:
-  #   matchLabels:
-  #     kubernetes.io/metadata.name: some-namespace
+# Passed through verbatim as the Gateway's spec.allowedListeners, giving full
+# access to the Gateway API AllowedListeners schema. Controls which ListenerSets
+# may attach to this Gateway. The default below allows ListenerSets from the same
+# namespace; override the whole block to use a selector or widen/narrow the scope.
+# The Gateway API's own default is "from: None" (no ListenerSets attach), so this
+# default is set explicitly here rather than relying on the API default.
+allowedListeners:
+  namespaces:
+    from: Same   # Same | All | Selector | None
+    # selector:
+    #   matchLabels:
+    #     kubernetes.io/metadata.name: some-namespace
 
 # Listeners define the ports and protocols the Gateway accepts traffic on.
 # If empty, a base HTTP :80 listener is created to satisfy the Gateway API

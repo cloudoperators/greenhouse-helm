@@ -21,9 +21,11 @@ spec:
     - type: IPAddress
       value: {{ . | quote }}
   {{- end }}
+  {{- with .Values.allowedListeners }}
+  # Passed through verbatim as spec.allowedListeners. See values.yaml.
   allowedListeners:
-    namespaces:
-      {{- include "gateway.allowedNamespaces" . | nindent 6 }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   # The Gateway API requires at least one listener on the Gateway itself.
   # This base HTTP :80 listener satisfies that requirement.
   listeners:
