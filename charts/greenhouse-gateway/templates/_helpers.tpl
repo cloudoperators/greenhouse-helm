@@ -51,12 +51,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Name of the Gateway resource. Uses global.gateway.parentRefName when set so the
+Name of the Gateway resource. Uses global.gateway.name when set so the
 producer name and consumer parentRefs share one value; falls back to the fullname.
 */}}
 {{- define "gateway.resourceName" -}}
 {{- $gw := (.Values.global | default dict).gateway | default dict -}}
-{{- $gw.parentRefName | default (include "gateway.fullname" .) -}}
+{{- $gw.name | default (include "gateway.fullname" .) -}}
 {{- end }}
 
 {{/*

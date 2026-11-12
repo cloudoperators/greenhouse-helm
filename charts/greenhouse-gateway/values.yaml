@@ -72,10 +72,9 @@ gatewayParameters:
     #     type: RollingUpdate
 
 global:
-  dnsDomain: ""
   gateway:
     # Name of the Gateway resource this chart creates. When set, consumers
     # (dashboard, cors-proxy, oidc-discovery) reference the same value as their
     # parentRef, so one value names the Gateway and points every ListenerSet at it.
     # When empty, the name falls back to the chart's fullname.
-    parentRefName: ""
+    name: ""
