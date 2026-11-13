@@ -76,8 +76,10 @@ gatewayParameters:
 # Arbitrary extra manifests to render alongside the chart's own resources. Each
 # list entry is emitted verbatim as its own object (NOT run through tpl), so any
 # Go-template syntax in the values is passed through untouched. The chart does not
-# interpret or wire these up. A common use is an image pull Secret for a custom
-# gateway proxy image, which you then reference yourself from
+# interpret, encode, or wire these up — you are responsible for the final form of
+# every field (e.g. Secret `data` values must already be base64-encoded, whereas
+# `stringData` values are plaintext). A common use is an image pull Secret for a
+# custom gateway proxy image, which you then reference yourself from
 # gatewayParameters.kube.podTemplate.imagePullSecrets.
 extraObjects: []
   # - apiVersion: v1
@@ -85,8 +87,10 @@ extraObjects: []
   #   metadata:
   #     name: gateway-registry-creds
   #   type: kubernetes.io/dockerconfigjson
-  #   data:
-  #     .dockerconfigjson: <base64 docker config json>
+  #   # stringData is plaintext (the API server encodes it); use data: for an
+  #   # already-base64-encoded value instead.
+  #   stringData:
+  #     .dockerconfigjson: '{"auths":{"my-registry.example.com":{"username":"...","password":"..."}}}'
 
 global:
   gateway:
