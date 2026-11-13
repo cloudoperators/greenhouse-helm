@@ -41,3 +41,25 @@ Usage: {{ include "flattenOptionValues" (dict "prefix" "externaldns" "values" .V
 {{- end -}}
 {{- end -}}
 {{- end }}
+
+{{/*
+Merge pluginGlobals into a single plugin's optionValues map.
+Each .Values.pluginGlobals entry is {plugins: [names], values: {map}}; an entry
+applies when its `plugins` list is empty/absent or contains the plugin name.
+Applicable entries' `values` form the base (later entries override earlier), and
+the plugin's own optionValues are layered on top so the plugin always wins.
+deepCopy guards the shared global dicts from being mutated across plugins.
+Returns the merged map as a YAML string (caller pipes through fromYaml).
+Usage: {{ include "pluginOptionValues" (dict "name" $name "own" $own "root" $) | fromYaml }}
+*/}}
+{{- define "pluginOptionValues" -}}
+{{- $merged := dict -}}
+{{- range $entry := (($.root.Values.pluginGlobals) | default list) -}}
+{{- $targets := ($entry.plugins | default list) -}}
+{{- if or (eq (len $targets) 0) (has $.name $targets) -}}
+{{- $merged = mergeOverwrite $merged (deepCopy ($entry.values | default dict)) -}}
+{{- end -}}
+{{- end -}}
+{{- $merged = mergeOverwrite $merged (deepCopy ($.own | default dict)) -}}
+{{- toYaml $merged -}}
+{{- end }}

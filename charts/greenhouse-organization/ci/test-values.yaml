@@ -5,6 +5,25 @@ global:
   dnsDomain: example.com
   supportGroup: default
 
+# Cross-plugin option values (templates/plugins/plugins.yaml merge).
+pluginGlobals:
+  # Applies to every plugin.
+  - plugins: []
+    values:
+      global:
+        dnsDomain: example.com
+  # Targets a subset; also sets cert-manager.webhook.timeoutSeconds, which the
+  # cert-manager plugin overrides in its own optionValues (plugin wins -> 15).
+  - plugins: [cert-manager, perses]
+    values:
+      global:
+        gateway:
+          name: greenhouse-gateway
+          namespace: greenhouse
+      cert-manager:
+        webhook:
+          timeoutSeconds: 99
+
 organization:
   enabled: true
   mappedOrgAdminIdPGroup: org-admins
