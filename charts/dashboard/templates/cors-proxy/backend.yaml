@@ -3,11 +3,11 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.dashboard.corsProxy.enabled -}}
+{{- if .Values.dashboard.proxy.enabled -}}
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: Backend
 metadata:
-  name: {{ include "dashboard.corsProxy.fullname" . }}-apiserver
+  name: {{ include "dashboard.proxy.fullname" . }}-apiserver
   namespace: {{ .Release.Namespace }}
 spec:
   type: Static

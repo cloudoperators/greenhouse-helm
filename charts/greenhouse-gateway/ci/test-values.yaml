@@ -1,9 +1,6 @@
 # SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse contributors
 # SPDX-License-Identifier: Apache-2.0
 
-global:
-  dnsDomain: example.tld
-
 annotations:
   cert-manager.io/issuer: letsencrypt-issuer
 
@@ -12,7 +9,8 @@ infrastructure:
     external-dns.kubernetes.io/target: ingress.example.tld
 
 allowedListeners:
-  from: Same
+  namespaces:
+    from: Same
 
 listeners:
   - name: https-wildcard

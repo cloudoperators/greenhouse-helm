@@ -21,13 +21,15 @@ infrastructure:
   annotations: {}
     # external-dns.kubernetes.io/target: ingress.example.tld
 
-# Controls which namespaces ListenerSets may attach from.
-# Rendered under spec.allowedListeners.namespaces. Defaults to "from: Same".
-allowedListeners: {}
-  # from: Same   # Same | All | Selector | None
-  # selector:
-  #   matchLabels:
-  #     kubernetes.io/metadata.name: some-namespace
+# Passed through verbatim as the Gateway's spec.allowedListeners. Controls which ListenerSets
+# may attach to this Gateway. The default below allows ListenerSets from the same namespace;
+# Override the whole block to use a selector or widen/narrow the scope.
+allowedListeners:
+  namespaces:
+    from: Same   # Same | All | Selector | None
+    # selector:
+    #   matchLabels:
+    #     kubernetes.io/metadata.name: some-namespace
 
 # Listeners define the ports and protocols the Gateway accepts traffic on.
 # If empty, a base HTTP :80 listener is created to satisfy the Gateway API
@@ -71,11 +73,27 @@ gatewayParameters:
     #   strategy:
     #     type: RollingUpdate
 
+# Arbitrary extra manifests to render alongside the chart's own resources. Each
+# list entry is emitted verbatim as its own object (NOT run through tpl), so any
+# Go-template syntax in the values is passed through untouched.
+# A common use is an image pull Secret for a custom gateway proxy image, which you
+# then reference yourself from gatewayParameters.kube.podTemplate.imagePullSecrets.
+# see - https://kgateway.dev/docs/envoy/latest/setup/customize/configs/
+extraObjects: []
+  # - apiVersion: v1
+  #   kind: Secret
+  #   metadata:
+  #     name: gateway-registry-creds
+  #   type: kubernetes.io/dockerconfigjson
+  #   # stringData is plaintext (the API server encodes it); use data: for an
+  #   # already-base64-encoded value instead.
+  #   stringData:
+  #     .dockerconfigjson: '{"auths":{"my-registry.example.com":{"username":"...","password":"..."}}}'
+
 global:
-  dnsDomain: ""
   gateway:
     # Name of the Gateway resource this chart creates. When set, consumers
     # (dashboard, cors-proxy, oidc-discovery) reference the same value as their
     # parentRef, so one value names the Gateway and points every ListenerSet at it.
     # When empty, the name falls back to the chart's fullname.
-    parentRefName: ""
+    name: ""

@@ -9,11 +9,11 @@ spec:
   displayName: Dashboard
   description: >-
     Greenhouse dashboard — the web UI for viewing and managing the Greenhouse platform.
-  version: "0.3.0"
+  version: "0.4.2"
   helmChart:
     name: dashboard
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.3.0
+    version: 0.4.2
   options:
     - name: global.dnsDomain
       displayName: DNS domain
@@ -26,7 +26,7 @@ spec:
       required: true
       default: origin
       type: string
-    - name: global.gateway.parentRefName
+    - name: global.gateway.name
       displayName: Parent Gateway name
       description: Name of the externally provided Gateway the dashboard and cors-proxy ListenerSets attach to. Required when gateway exposure or the gateway CORS proxy is enabled.
       required: false
@@ -54,7 +54,7 @@ spec:
       required: false
       default: false
       type: bool
-    - name: dashboard.corsProxy.enabled
+    - name: dashboard.proxy.enabled
       displayName: Gateway CORS proxy
       description: Expose the Kubernetes API server through the gateway with CORS headers so the dashboard can call the API from the browser.
       required: false
