@@ -7,7 +7,7 @@
 global:
   dnsDomain: example.com
   gateway:
-    parentRefName: greenhouse-gateway
+    name: greenhouse-gateway
 
 discovery:
   enabled: true

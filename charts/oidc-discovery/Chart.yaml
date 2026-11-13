@@ -8,7 +8,7 @@ description: >-
   discovery endpoints (/.well-known/openid-configuration, /openid/v1/jwks)
   through an externally provided Gateway (Gateway API).
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "v0.1.0"
 
 maintainers:

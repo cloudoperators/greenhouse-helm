@@ -11,8 +11,8 @@ global:
   # Externally provided Gateway that the discovery ListenerSet attaches to.
   # Shared across the Greenhouse charts that expose services through the gateway.
   gateway:
-    parentRefName: ""
-    parentRefNamespace: ""
+    name: ""
+    namespace: ""
 
 # API-server OIDC discovery server. Exposes the Kubernetes discovery endpoints
 # (/.well-known/openid-configuration and /openid/v1/jwks) through an externally
