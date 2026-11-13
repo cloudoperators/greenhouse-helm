@@ -73,6 +73,21 @@ gatewayParameters:
     #   strategy:
     #     type: RollingUpdate
 
+# Arbitrary extra manifests to render alongside the chart's own resources. Each
+# list entry is emitted verbatim as its own object (rendered through tpl, so it
+# may use {{ .Release.Namespace }} etc.). The chart does not interpret or wire
+# these up in any way. A common use is an image pull Secret for a custom gateway
+# proxy image, which you then reference yourself from
+# gatewayParameters.kube.podTemplate.imagePullSecrets.
+extraObjects: []
+  # - apiVersion: v1
+  #   kind: Secret
+  #   metadata:
+  #     name: gateway-registry-creds
+  #   type: kubernetes.io/dockerconfigjson
+  #   data:
+  #     .dockerconfigjson: eyJhdXRocyI6e319
+
 global:
   gateway:
     # Name of the Gateway resource this chart creates. When set, consumers
