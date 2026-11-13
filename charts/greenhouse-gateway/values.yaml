@@ -80,13 +80,27 @@ gatewayParameters:
 # proxy image, which you then reference yourself from
 # gatewayParameters.kube.podTemplate.imagePullSecrets.
 extraObjects: []
+  # Image pull Secret whose credentials are resolved in-cluster by secrets-injector.
+  # Non-obvious requirements (all load-bearing):
+  #   * type kubernetes.io/dockerconfigjson is on the injector's default ignore
+  #     list, so it MUST carry cloud.sap/inject-secrets: "true" to opt back in.
+  #   * The injector only runs {{ resolve }} templating on the decoded `data` value,
+  #     so the dockerconfigjson goes under `data:` base64-encoded.
+  #   * Inside resolve, the vault ref must use backticks, not double quotes.
+  # The value below is the base64 of this JSON (supply it pre-encoded so the chart's
+  # own tpl pass leaves the {{ resolve }} untouched for the injector to evaluate):
+  #   {"auths":{"my-registry.example.com":{
+  #     "username":"{{ resolve `vault+kvv2:///secrets/path/to/registry/username` }}",
+  #     "password":"{{ resolve `vault+kvv2:///secrets/path/to/registry/password` }}"}}}
   # - apiVersion: v1
   #   kind: Secret
   #   metadata:
   #     name: gateway-registry-creds
+  #     annotations:
+  #       cloud.sap/inject-secrets: "true"
   #   type: kubernetes.io/dockerconfigjson
   #   data:
-  #     .dockerconfigjson: eyJhdXRocyI6e319
+  #     .dockerconfigjson: eyJhdXRocyI6eyJteS1yZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6Int7IHJlc29sdmUgYHZhdWx0K2t2djI6Ly8vc2VjcmV0cy9wYXRoL3RvL3JlZ2lzdHJ5L3VzZXJuYW1lYCB9fSIsInBhc3N3b3JkIjoie3sgcmVzb2x2ZSBgdmF1bHQra3Z2MjovLy9zZWNyZXRzL3BhdGgvdG8vcmVnaXN0cnkvcGFzc3dvcmRgIH19In19fQ==
 
 global:
   gateway:
