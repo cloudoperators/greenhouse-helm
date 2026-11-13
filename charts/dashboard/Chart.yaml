@@ -5,7 +5,9 @@ apiVersion: v2
 type: application
 description: A Helm chart for hosting the dashboard
 name: dashboard
-version: 0.3.0
+version: 0.4.2
+# Default tag for the juno-app-greenhouse image (image.tag falls back to this).
+appVersion: "0.14.21"
 
 maintainers:
   - name: abhijith-darshan

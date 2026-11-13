@@ -3,22 +3,22 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.dashboard.corsProxy.enabled -}}
+{{- if .Values.dashboard.proxy.enabled -}}
 # Applies CORS headers to the API-server route so the Greenhouse dashboard can
 # call the Kubernetes API from the browser, and disables the request /
 # stream-idle timeouts so long-lived watches and log streams stay open.
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
-  name: {{ include "dashboard.corsProxy.fullname" . }}
+  name: {{ include "dashboard.proxy.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: {{ include "dashboard.corsProxy.fullname" . }}
+      name: {{ include "dashboard.proxy.fullname" . }}
   cors:
-    allowCredentials: {{ .Values.dashboard.corsProxy.cors.allowCredentials }}
+    allowCredentials: {{ .Values.dashboard.proxy.cors.allowCredentials }}
     # The dashboard SPA origins are always allowed first: the base host and the
     # "*.<host>" wildcard (kgateway compiles the wildcard to a regex match),
     # matching the two hosts the dashboard Ingress serves. Any configured
@@ -26,17 +26,17 @@ spec:
     allowOrigins:
       - {{ printf "https://%s" (include "dashboard.hostname" .) }}
       - {{ printf "https://*.%s" (include "dashboard.hostname" .) }}
-      {{- with .Values.dashboard.corsProxy.cors.allowOrigins }}
+      {{- with .Values.dashboard.proxy.cors.allowOrigins }}
       {{- toYaml . | nindent 6 }}
       {{- end }}
     allowMethods:
-      {{- toYaml .Values.dashboard.corsProxy.cors.allowMethods | nindent 6 }}
+      {{- toYaml .Values.dashboard.proxy.cors.allowMethods | nindent 6 }}
     allowHeaders:
-      {{- toYaml .Values.dashboard.corsProxy.cors.allowHeaders | nindent 6 }}
+      {{- toYaml .Values.dashboard.proxy.cors.allowHeaders | nindent 6 }}
     exposeHeaders:
-      {{- toYaml .Values.dashboard.corsProxy.cors.exposeHeaders | nindent 6 }}
-    maxAge: {{ .Values.dashboard.corsProxy.cors.maxAge }}
-  {{- with .Values.dashboard.corsProxy.timeouts }}
+      {{- toYaml .Values.dashboard.proxy.cors.exposeHeaders | nindent 6 }}
+    maxAge: {{ .Values.dashboard.proxy.cors.maxAge }}
+  {{- with .Values.dashboard.proxy.timeouts }}
   timeouts:
     {{- with .request }}
     request: {{ . | quote }}

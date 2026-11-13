@@ -43,7 +43,7 @@ contains "dashboard". Falls back to "<release>-dashboard" otherwise.
 {{- end }}
 
 {{/* Resource name for the gateway cors-proxy sub-chart resources. */}}
-{{- define "dashboard.corsProxy.fullname" -}}
+{{- define "dashboard.proxy.fullname" -}}
 {{- printf "%s-cors-proxy" (include "dashboard.fullname" .) }}
 {{- end }}
 
@@ -53,7 +53,8 @@ contains "dashboard". Falls back to "<release>-dashboard" otherwise.
 {{- end }}
 
 {{/*
-Print the image reference. Digest takes precedence over tag.
+Print the image reference. A digest, when supplied, takes precedence over the
+tag; otherwise the tag is used, defaulting to the chart's appVersion.
 */}}
 {{- define "dashboard.image" -}}
 {{- $repository := ( required ".Values.image.repository missing" .Values.image.repository ) -}}
@@ -61,6 +62,7 @@ Print the image reference. Digest takes precedence over tag.
 {{- if $digest -}}
   {{- printf "%s@%s" $repository $digest -}}
 {{- else -}}
-  {{- printf "%s:%s" $repository ( required ".Values.image.tag missing" .Values.image.tag ) -}}
+  {{- $tag := .Values.image.tag | default .Chart.AppVersion -}}
+  {{- printf "%s:%s" $repository ( required "image.tag or Chart appVersion required" $tag ) -}}
 {{- end -}}
 {{- end -}}
