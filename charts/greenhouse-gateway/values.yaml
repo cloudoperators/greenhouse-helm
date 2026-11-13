@@ -74,33 +74,25 @@ gatewayParameters:
     #     type: RollingUpdate
 
 # Arbitrary extra manifests to render alongside the chart's own resources. Each
-# list entry is emitted verbatim as its own object (rendered through tpl, so it
-# may use {{ .Release.Namespace }} etc.). The chart does not interpret or wire
-# these up in any way. A common use is an image pull Secret for a custom gateway
-# proxy image, which you then reference yourself from
+# list entry is emitted verbatim as its own object (NOT run through tpl), so values
+# containing Go-template syntax pass through untouched — in particular
+# secrets-injector's {{ resolve "vault+kvv2:///..." }} references. The chart does not
+# interpret or wire these up. A common use is an image pull Secret for a custom
+# gateway proxy image, which you then reference yourself from
 # gatewayParameters.kube.podTemplate.imagePullSecrets.
 extraObjects: []
-  # Image pull Secret whose credentials are resolved in-cluster by secrets-injector.
-  # Non-obvious requirements (all load-bearing):
-  #   * type kubernetes.io/dockerconfigjson is on the injector's default ignore
-  #     list, so it MUST carry cloud.sap/inject-secrets: "true" to opt back in.
-  #   * The injector only runs {{ resolve }} templating on the decoded `data` value,
-  #     so the dockerconfigjson goes under `data:` base64-encoded.
-  #   * Inside resolve, the vault ref must use backticks, not double quotes.
-  # The value below is the base64 of this JSON (supply it pre-encoded so the chart's
-  # own tpl pass leaves the {{ resolve }} untouched for the injector to evaluate):
-  #   {"auths":{"my-registry.example.com":{
-  #     "username":"{{ resolve `vault+kvv2:///secrets/path/to/registry/username` }}",
-  #     "password":"{{ resolve `vault+kvv2:///secrets/path/to/registry/password` }}"}}}
+  # Image pull Secret whose credentials secrets-injector resolves from Vault in-cluster.
+  # Use type: Opaque with the .dockerconfigjson under stringData — Opaque is NOT on the
+  # injector's ignore list, so no cloud.sap/inject-secrets annotation is needed (a
+  # kubernetes.io/dockerconfigjson-typed secret would require it). The {{ resolve }}
+  # references are passed through verbatim (the chart does not tpl entries).
   # - apiVersion: v1
   #   kind: Secret
   #   metadata:
   #     name: gateway-registry-creds
-  #     annotations:
-  #       cloud.sap/inject-secrets: "true"
-  #   type: kubernetes.io/dockerconfigjson
-  #   data:
-  #     .dockerconfigjson: eyJhdXRocyI6eyJteS1yZWdpc3RyeS5leGFtcGxlLmNvbSI6eyJ1c2VybmFtZSI6Int7IHJlc29sdmUgYHZhdWx0K2t2djI6Ly8vc2VjcmV0cy9wYXRoL3RvL3JlZ2lzdHJ5L3VzZXJuYW1lYCB9fSIsInBhc3N3b3JkIjoie3sgcmVzb2x2ZSBgdmF1bHQra3Z2MjovLy9zZWNyZXRzL3BhdGgvdG8vcmVnaXN0cnkvcGFzc3dvcmRgIH19In19fQ==
+  #   type: Opaque
+  #   stringData:
+  #     .dockerconfigjson: '{"auths":{"my-registry.example.com":{"username":"{{ resolve "vault+kvv2:///secrets/path/to/registry/username" }}","password":"{{ resolve "vault+kvv2:///secrets/path/to/registry/password" }}"}}}'
 
 global:
   gateway:
