@@ -43,9 +43,10 @@ spec:
   ignoreDifferences:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with $plugin.optionValues }}
-  {{- $ov := . }}
-  {{- if typeIs "string" . }}{{- $ov = tpl . $ | fromYaml }}{{- end }}
+  {{- $own := $plugin.optionValues | default dict }}
+  {{- if typeIs "string" $own }}{{- $own = tpl $own $ | fromYaml }}{{- end }}
+  {{- $ov := include "pluginOptionValues" (dict "name" $name "own" $own "root" $) | fromYaml }}
+  {{- if $ov }}
   optionValues:
     {{- include "flattenOptionValues" (dict "prefix" "" "values" $ov) | nindent 4 }}
   {{- end }}

@@ -103,6 +103,22 @@ catalogs: {}
 # -- Greenhouse Plugin CRs, rendered by templates/plugins/plugins.yaml. Each key is a plugin.
 plugins: {}
 
+# -- Option values applied across multiple plugins. A list of entries; each targets
+# a list of plugin keys (empty/omitted = all plugins) and its `values` are merged
+# into each targeted plugin's optionValues (at the root — not scoped under global).
+# A plugin's own optionValues win on conflict; later list entries override earlier.
+pluginGlobals: []
+  # - plugins: []                      # empty = applies to every plugin
+  #   values:
+  #     global:
+  #       dnsDomain: greenhouse.example.com
+  # - plugins: [dashboard, oidc-discovery]
+  #   values:
+  #     global:
+  #       gateway:
+  #         name: greenhouse-gateway
+  #         namespace: greenhouse
+
 # -- Deploy the bundled Flux observability: state-metrics ConfigMap, PrometheusRule alerts, and perses dashboards.
 fluxAlerts:
   # -- Enable the bundled Flux state-metrics ConfigMap, PrometheusRule alerts, and dashboards.

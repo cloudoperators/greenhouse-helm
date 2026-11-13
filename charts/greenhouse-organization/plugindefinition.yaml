@@ -10,11 +10,11 @@ spec:
   description: >-
     Resources required to run a Greenhouse admin organization — the Organization,
     Teams, RBAC, Catalogs and optional extension Plugins.
-  version: "0.1.0"
+  version: "0.1.1"
   helmChart:
     name: greenhouse-organization
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.1.0
+    version: 0.1.1
   options:
     - name: global.dnsDomain
       displayName: DNS domain
@@ -26,3 +26,12 @@ spec:
       description: IdP group mapped to the organization's admins. Always required.
       required: true
       type: string
+    - name: pluginGlobals
+      displayName: Plugin globals
+      description: >-
+        Option values applied across multiple plugins. A list of entries, each
+        targeting a list of plugin keys (empty = all plugins) whose values are
+        merged into each targeted plugin's optionValues. A plugin's own
+        optionValues win on conflict.
+      required: false
+      type: object
