@@ -5,10 +5,9 @@ SPDX-License-Identifier: Apache-2.0
 
 {{/*
 Render arbitrary user-supplied manifests verbatim. Each entry is emitted as-is
-(no tpl), so values containing Go-template syntax — e.g. secrets-injector's
-{{ resolve "vault+kvv2:///..." }} — pass through untouched to the cluster. Useful
-for resources this chart does not model directly, e.g. an image pull Secret that
-is then referenced from gatewayParameters.kube.podTemplate.imagePullSecrets.
+(no tpl), so any Go-template syntax in the values passes through untouched to the
+cluster. Useful for resources this chart does not model directly, e.g. an image
+pull Secret that is then referenced from gatewayParameters.kube.podTemplate.imagePullSecrets.
 */}}
 {{- range .Values.extraObjects }}
 ---

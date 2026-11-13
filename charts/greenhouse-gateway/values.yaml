@@ -74,25 +74,19 @@ gatewayParameters:
     #     type: RollingUpdate
 
 # Arbitrary extra manifests to render alongside the chart's own resources. Each
-# list entry is emitted verbatim as its own object (NOT run through tpl), so values
-# containing Go-template syntax pass through untouched — in particular
-# secrets-injector's {{ resolve "vault+kvv2:///..." }} references. The chart does not
+# list entry is emitted verbatim as its own object (NOT run through tpl), so any
+# Go-template syntax in the values is passed through untouched. The chart does not
 # interpret or wire these up. A common use is an image pull Secret for a custom
 # gateway proxy image, which you then reference yourself from
 # gatewayParameters.kube.podTemplate.imagePullSecrets.
 extraObjects: []
-  # Image pull Secret whose credentials secrets-injector resolves from Vault in-cluster.
-  # Use type: Opaque with the .dockerconfigjson under stringData — Opaque is NOT on the
-  # injector's ignore list, so no cloud.sap/inject-secrets annotation is needed (a
-  # kubernetes.io/dockerconfigjson-typed secret would require it). The {{ resolve }}
-  # references are passed through verbatim (the chart does not tpl entries).
   # - apiVersion: v1
   #   kind: Secret
   #   metadata:
   #     name: gateway-registry-creds
-  #   type: Opaque
-  #   stringData:
-  #     .dockerconfigjson: '{"auths":{"my-registry.example.com":{"username":"{{ resolve "vault+kvv2:///secrets/path/to/registry/username" }}","password":"{{ resolve "vault+kvv2:///secrets/path/to/registry/password" }}"}}}'
+  #   type: kubernetes.io/dockerconfigjson
+  #   data:
+  #     .dockerconfigjson: <base64 docker config json>
 
 global:
   gateway:
