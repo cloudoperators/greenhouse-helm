@@ -9,13 +9,15 @@ global:
   # Externally provided Gateway that the dashboard and cors-proxy ListenerSets attach to.
   # Shared across the Greenhouse charts that expose services through the gateway.
   gateway:
-    parentRefName: ""
-    parentRefNamespace: ""
+    name: ""
+    namespace: ""
 
 image:
   repository: ghcr.io/cloudoperators/juno-app-greenhouse
-  # Overrides the image tag to use a specific digest instead
-  digest: sha256:ae366951d37198d05d6b3d5859dec8181530d380ea7b9a8a8cfc5a8f07937631
+  # Image tag. Defaults to the chart's appVersion when unset.
+  tag: ""
+  # Optional. Pin a specific image by digest. When set, the digest takes precedence over tag.
+  digest: ""
   pullPolicy: IfNotPresent
 
 replicas: 2
@@ -46,9 +48,9 @@ dashboard:
   # TrafficPolicy, so the dashboard SPA can call the API from the browser.
   # The exposed hostname is the dashboard's API host (dashboard.apiHostname,
   # else <global.kubeAPISubDomain|'api'>.<global.dnsDomain>).
-  corsProxy:
+  proxy:
     # Render the gateway cors-proxy resources.
-    enabled: true
+    enabled: false
     # Annotations placed on the ListenerSet resource (e.g. cert-manager issuer).
     listenerSetAnnotations: {}
     # Annotations placed on the HTTPRoute resource (e.g. external-dns).
@@ -86,7 +88,7 @@ dashboard:
       request: 0s
       streamIdle: 0s
   # Gateway-based exposure of the dashboard UI. Attaches a ListenerSet to the
-  # externally provided Gateway (global.gateway.parentRefName) and routes the
+  # externally provided Gateway (global.gateway.name) and routes the
   # dashboard host (and its "*." wildcard) to the dashboard Service. Default
   # exposure; the legacy Ingress (ingress.enabled) is the alternative.
   gateway:

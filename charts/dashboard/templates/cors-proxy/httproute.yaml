@@ -3,13 +3,13 @@ SPDX-FileCopyrightText: 2026 SAP SE or an SAP affiliate company and Greenhouse c
 SPDX-License-Identifier: Apache-2.0
 */}}
 
-{{- if .Values.dashboard.corsProxy.enabled -}}
+{{- if .Values.dashboard.proxy.enabled -}}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: {{ include "dashboard.corsProxy.fullname" . }}
+  name: {{ include "dashboard.proxy.fullname" . }}
   namespace: {{ .Release.Namespace }}
-  {{- with .Values.dashboard.corsProxy.httpRouteAnnotations }}
+  {{- with .Values.dashboard.proxy.httpRouteAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -17,7 +17,7 @@ spec:
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: ListenerSet
-      name: {{ include "dashboard.corsProxy.fullname" . }}
+      name: {{ include "dashboard.proxy.fullname" . }}
       sectionName: https-cors-proxy
   hostnames:
     - {{ include "dashboard.api.host" . | quote }}
@@ -33,5 +33,5 @@ spec:
       backendRefs:
         - group: gateway.kgateway.dev
           kind: Backend
-          name: {{ include "dashboard.corsProxy.fullname" . }}-apiserver
+          name: {{ include "dashboard.proxy.fullname" . }}-apiserver
 {{- end }}
