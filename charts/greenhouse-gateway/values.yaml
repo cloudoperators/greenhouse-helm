@@ -78,6 +78,7 @@ gatewayParameters:
 # Go-template syntax in the values is passed through untouched.
 # A common use is an image pull Secret for a custom gateway proxy image, which you
 # then reference yourself from gatewayParameters.kube.podTemplate.imagePullSecrets.
+# see - https://kgateway.dev/docs/envoy/latest/setup/customize/configs/
 extraObjects: []
   # - apiVersion: v1
   #   kind: Secret
