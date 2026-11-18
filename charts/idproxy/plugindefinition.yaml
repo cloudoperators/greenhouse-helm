@@ -9,11 +9,11 @@ spec:
   displayName: IdP Proxy
   description: >-
     Greenhouse IdP Proxy — a Dex-based OIDC issuer that federates upstream identity providers and issues tokens for the platform.
-  version: "0.1.1"
+  version: "0.1.2"
   helmChart:
     name: idproxy
     repository: oci://ghcr.io/cloudoperators/greenhouse-helm/charts
-    version: 0.1.1
+    version: 0.1.2
   options:
     - name: global.dnsDomain
       displayName: DNS domain
@@ -24,4 +24,19 @@ spec:
       displayName: Dex backend
       description: Storage backend for Dex (e.g. kubernetes or postgres).
       required: true
+      type: string
+    - name: hostname
+      displayName: Hostname
+      description: Bare host at which the IdP proxy is exposed (ingress host, gateway hostname, and OIDC issuer). Defaults to auth.<dnsDomain> when unset.
+      required: false
+      type: string
+    - name: global.gateway.name
+      displayName: Parent Gateway name
+      description: Name of the externally provided Gateway the idproxy ListenerSet attaches to. Shared across the Greenhouse charts that attach to the gateway. Required when gateway.enabled is true.
+      required: false
+      type: string
+    - name: global.gateway.namespace
+      displayName: Parent Gateway namespace
+      description: Namespace of the parent Gateway. Defaults to the release namespace when unset.
+      required: false
       type: string

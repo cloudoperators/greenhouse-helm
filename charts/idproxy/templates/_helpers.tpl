@@ -74,9 +74,18 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{/* Render the auth hostname */}}
+{{/* Render the auth hostname. Override with .Values.hostname (bare host). */}}
 {{- define "idproxy.auth.hostname" -}}
+{{- if .Values.hostname }}
+{{- .Values.hostname }}
+{{- else }}
 {{- printf "%s.%s" "auth" (required "global.dnsDomain missing" .Values.global.dnsDomain) }}
+{{- end }}
+{{- end }}
+
+{{/* Resource name for the gateway exposure resources (ListenerSet + HTTPRoute). */}}
+{{- define "idproxy.gateway.fullname" -}}
+{{- printf "%s-gateway" (include "idproxy.fullname" .) }}
 {{- end }}
 
 {{/*
