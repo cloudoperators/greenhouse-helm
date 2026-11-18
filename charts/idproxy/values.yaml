@@ -49,8 +49,6 @@ securityContext:
     drop:
     - ALL
 
-# Bare host at which the IdP proxy is exposed. Drives the ingress host, the
-# gateway listener/route hostname, and the OIDC --issuer URL.
 # Defaults to auth.<global.dnsDomain> when empty.
 hostname: ""
 
@@ -66,7 +64,6 @@ ingress:
 
 gateway:
   # Render the Gateway API exposure resources (ListenerSet + HTTPRoute).
-  # Opt-in; the legacy ingress above remains the default exposure.
   enabled: false
   listenerSetAnnotations: {}
   httpRouteAnnotations: {}
