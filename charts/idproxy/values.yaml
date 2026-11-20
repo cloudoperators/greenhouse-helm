@@ -49,6 +49,9 @@ securityContext:
     drop:
     - ALL
 
+# Defaults to auth.<global.dnsDomain> when empty.
+hostname: ""
+
 service:
   type: ClusterIP
   port: 80
@@ -58,6 +61,16 @@ ingress:
   className: "nginx"
   tls: true
   annotations: {}
+
+gateway:
+  # Render the Gateway API exposure resources (ListenerSet + HTTPRoute).
+  enabled: false
+  listenerSetAnnotations: {}
+  httpRouteAnnotations: {}
+  tls:
+    # Secret holding the TLS cert for the gateway listener.
+    # Defaults to <fullname>-gateway-tls when unset.
+    secretName: ""
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -76,6 +89,13 @@ nodeSelector: {}
 tolerations: []
 
 global:
+  # Base DNS domain for this Greenhouse installation; idproxy is exposed at auth.<dnsDomain>.
+  dnsDomain: ""
+  # Externally provided Gateway that the idproxy ListenerSet attaches to.
+  # Shared across the Greenhouse charts that expose services through the gateway.
+  gateway:
+    name: ""
+    namespace: ""
   dex:
     backend: kubernetes
     postgresql:
