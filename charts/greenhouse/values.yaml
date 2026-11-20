@@ -51,6 +51,8 @@ serviceAccount:
   # Name of the service account. Defaults to the full release name when create is true.
   name: ""
 
+greenhouseCatalogRBACsEnabled: false
+
 alerts:
   # Deploy PrometheusRule manifests for Greenhouse control-plane alerting.
   enabled: true

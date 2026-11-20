@@ -1,0 +1,30 @@
+{{ if .Values.greenhouseCatalogRBACsEnabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: greenhouse-catalog-sa
+  namespace: greenhouse
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: greenhouse-catalog-role
+rules:
+  - apiGroups: ["greenhouse.sap"]
+    resources: ["clusterplugindefinitions", "plugindefinitions"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: greenhouse-catalog-role
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: greenhouse-catalog-role
+subjects:
+  - kind: ServiceAccount
+    name: greenhouse-catalog-sa
+    namespace: greenhouse
+{{ end }}
